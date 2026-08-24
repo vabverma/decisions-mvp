@@ -71,7 +71,7 @@ router.post('/register', authLimiter, async (req: AuthRequest, res: Response) =>
       console.error('Failed to send welcome email:', err)
     );
 
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.JWT_SECRET!;
     if (!secret) {
       throw new Error('JWT_SECRET not configured');
     }
@@ -102,7 +102,7 @@ router.post('/login', authLimiter, async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.JWT_SECRET!;
     if (!secret) {
       throw new Error('JWT_SECRET not configured');
     }
