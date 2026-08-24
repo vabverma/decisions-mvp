@@ -29,7 +29,12 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req: Re
     return res.status(400).json({ error: 'Invalid signature' });
   }
 
-  await processStripeEvent(event);
+  try {
+    await processStripeEvent(event);
+  } catch (error) {
+    console.error(`Failed to process webhook event ${event.type}:`, error);
+    // Still acknowledge receipt so Stripe doesn't retry-storm us; the error is logged for follow-up.
+  }
   res.json({ received: true });
 });
 

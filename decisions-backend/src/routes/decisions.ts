@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getPricingRecommendation } from '../services/claude.service';
 import { pool } from '../db/init';
 import { verifyToken } from '../middleware/auth';
+import { costlyEndpointLimiter } from '../middleware/rateLimit';
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ const pricingInputSchema = z.object({
   customerFeedback: z.string().max(1000).optional(),
 });
 
-router.post('/pricing', verifyToken, async (req: Request, res: Response) => {
+router.post('/pricing', verifyToken, costlyEndpointLimiter, async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
 
   if (!userId) {

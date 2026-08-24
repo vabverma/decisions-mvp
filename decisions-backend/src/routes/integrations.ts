@@ -1,18 +1,12 @@
 import express, { Request, Response } from 'express';
 import { pool } from '../db/init';
 import { verifyToken } from '../middleware/auth';
+import { costlyEndpointLimiter } from '../middleware/rateLimit';
+import { isSafeExternalUrl } from '../utils/ssrfGuard';
 import axios from 'axios';
 
 const router = express.Router();
-
-const isValidUrl = (urlString: string): boolean => {
-  try {
-    const url = new URL(urlString);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-};
+router.use(costlyEndpointLimiter);
 
 // Connect to n8n webhook
 router.post('/n8n/connect', verifyToken, async (req: Request, res: Response) => {
@@ -20,7 +14,7 @@ router.post('/n8n/connect', verifyToken, async (req: Request, res: Response) => 
   const { webhookUrl } = req.body;
 
   try {
-    if (!isValidUrl(webhookUrl)) {
+    if (typeof webhookUrl !== 'string' || !(await isSafeExternalUrl(webhookUrl))) {
       return res.status(400).json({ error: 'Invalid webhook URL' });
     }
 

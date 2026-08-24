@@ -9,6 +9,10 @@ import { sendWelcomeEmail } from '../services/email.service';
 
 const router = express.Router();
 
+// Constant-cost placeholder hash compared against on unknown emails so that
+// login response time doesn't reveal whether an account exists.
+const DUMMY_HASH = '$2b$12$nkagFMI3EKxcrTAiLWhYFO5Sw08CV1DeJcvTE.Z5XSrNqtonroae2';
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -94,12 +98,10 @@ router.post('/login', authLimiter, async (req: AuthRequest, res: Response) => {
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     const user = result.rows[0];
 
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-
-    const passwordValid = await bcrypt.compare(password, user.password_hash);
-    if (!passwordValid) {
+    // Always run bcrypt.compare, even for unknown emails, so response time
+    // doesn't leak whether an account exists (timing side-channel).
+    const passwordValid = await bcrypt.compare(password, user ? user.password_hash : DUMMY_HASH);
+    if (!user || !passwordValid) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 

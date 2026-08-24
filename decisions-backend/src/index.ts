@@ -14,12 +14,27 @@ import webhooksRoutes from './routes/webhooks';
 
 initSentry();
 
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled promise rejection:', reason);
+});
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Manual CORS headers
+const ALLOWED_ORIGINS = [
+  process.env.DASHBOARD_URL,
+  process.env.APP_URL,
+  'http://localhost:3000',
+  'http://localhost:3001',
+].filter((origin): origin is string => Boolean(origin));
+
+// CORS: allowlist known frontend origins only (never '*' on an authenticated API)
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 

@@ -2,18 +2,31 @@ import express, { Request, Response } from 'express';
 import { pool } from '../db/init';
 import { getStripe } from '../services/stripe.service';
 import { verifyToken } from '../middleware/auth';
+import { costlyEndpointLimiter } from '../middleware/rateLimit';
 
 const router = express.Router();
 
-const STARTER_PRICE_ID = process.env.STRIPE_STARTER_PRICE_ID || 'price_test_starter';
-const PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID || 'price_test_pro';
+const STARTER_PRICE_ID = process.env.STRIPE_STARTER_PRICE_ID;
+const PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID;
 
-router.post('/create-checkout', verifyToken, async (req: Request, res: Response) => {
+if (!STARTER_PRICE_ID || !PRO_PRICE_ID) {
+  console.error('🔴 CRITICAL: STRIPE_STARTER_PRICE_ID and STRIPE_PRO_PRICE_ID must be configured');
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  }
+}
+
+router.post('/create-checkout', verifyToken, costlyEndpointLimiter, async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   const { planType } = req.body;
 
   if (!planType || !['starter', 'pro'].includes(planType)) {
     return res.status(400).json({ error: 'Invalid plan type' });
+  }
+
+  if (!STARTER_PRICE_ID || !PRO_PRICE_ID) {
+    console.error('Checkout blocked: Stripe price IDs not configured');
+    return res.status(500).json({ error: 'Billing is not configured' });
   }
 
   try {
