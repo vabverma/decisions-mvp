@@ -40,9 +40,10 @@ async function processStripeEvent(event: Stripe.Event) {
       const subscription = event.data.object as Stripe.Subscription;
       const customerId = subscription.customer as string;
 
+      // Map Stripe price lookup keys to subscription tiers
       const planMap: Record<string, string> = {
-        'pricing_optimizer': 'pricing_optimizer',
-        'premium': 'premium',
+        'starter': 'starter',
+        'pro': 'pro',
       };
 
       const planId = (subscription.items.data[0]?.price.lookup_key || '');
