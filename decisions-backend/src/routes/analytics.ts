@@ -38,9 +38,24 @@ router.get('/dashboard', verifyToken, async (req: Request, res: Response) => {
       [userId]
     );
 
+    // pg returns NUMERIC/aggregate columns as strings; coerce to numbers so
+    // the frontend can safely call .toFixed()/.toLocaleString() on them.
+    const rawStats = recStats.rows[0];
+    const stats = {
+      total_recommendations: Number(rawStats.total_recommendations) || 0,
+      implemented: Number(rawStats.implemented) || 0,
+      avg_annual_impact: Number(rawStats.avg_annual_impact) || 0,
+      total_impact: Number(rawStats.total_impact) || 0,
+    };
+    const recentRecommendations = recent.rows.map((row) => ({
+      ...row,
+      recommended_price: Number(row.recommended_price),
+      annual_impact: Number(row.annual_impact),
+    }));
+
     res.json({
-      stats: recStats.rows[0],
-      recentRecommendations: recent.rows,
+      stats,
+      recentRecommendations,
       subscriptionTier: userResult.rows[0]?.subscription_tier,
     });
   } catch (error) {

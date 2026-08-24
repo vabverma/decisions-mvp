@@ -112,9 +112,9 @@ export default function Dashboard({ token }: DashboardProps) {
               {data.recentRecommendations.map((rec) => (
                 <tr key={rec.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                   <td style={{ padding: '12px' }}>{rec.product_name}</td>
-                  <td style={{ padding: '12px' }}>${rec.recommended_price ? rec.recommended_price.toFixed(2) : 'N/A'}</td>
+                  <td style={{ padding: '12px' }}>${rec.recommended_price ? Number(rec.recommended_price).toFixed(2) : 'N/A'}</td>
                   <td style={{ padding: '12px', color: '#28a745', fontWeight: 500 }}>
-                    ${rec.annual_impact?.toLocaleString() || '0'}
+                    ${rec.annual_impact ? Number(rec.annual_impact).toLocaleString() : '0'}
                   </td>
                   <td style={{ padding: '12px', color: '#999', fontSize: '14px' }}>
                     {new Date(rec.created_at).toLocaleDateString()}
