@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 interface RegisterProps {
   onRegister: (token: string) => void;
@@ -20,7 +20,7 @@ export default function Register({ onRegister }: RegisterProps) {
     setError('');
 
     try {
-      const response = await axios.post('/api/auth/register', { email, password, storeName });
+      const response = await api.post('/auth/register', { email, password, storeName });
       onRegister(response.data.token);
       navigate('/dashboard');
     } catch (err) {
