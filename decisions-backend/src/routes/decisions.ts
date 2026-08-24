@@ -33,23 +33,32 @@ router.post('/pricing', verifyToken, async (req: Request, res: Response) => {
   const { productName, currentPrice, cost, competitorPrice, monthlyVolume, demandTrend, customerFeedback } = validated;
 
   try {
-    // Check freemium limit
+    // Check tier-based limits
+    const tierLimits: Record<string, number> = {
+      free: 5,
+      starter: 20,
+      pro: 100,
+    };
+
     const userResult = await pool.query(
       `SELECT subscription_tier FROM users WHERE id = $1`,
       [userId]
     );
     const user = userResult.rows[0];
+    const tier = user.subscription_tier || 'free';
+    const limit = tierLimits[tier] || tierLimits.free;
 
-    if (user.subscription_tier === 'free') {
-      const usageResult = await pool.query(
-        `SELECT recommendations_this_month FROM usage_tracking WHERE user_id = $1`,
-        [userId]
-      );
+    const usageResult = await pool.query(
+      `SELECT recommendations_this_month FROM usage_tracking WHERE user_id = $1`,
+      [userId]
+    );
 
-      const usage = usageResult.rows[0];
-      if (usage && usage.recommendations_this_month >= 5) {
-        return res.status(403).json({ error: 'Free tier limited to 5 recommendations per month. Upgrade to get unlimited.' });
-      }
+    const usage = usageResult.rows[0];
+    if (usage && usage.recommendations_this_month >= limit) {
+      const tierName = tier === 'pro' ? 'Pro' : tier === 'starter' ? 'Starter' : 'Free';
+      return res.status(429).json({
+        error: `${tierName} tier limited to ${limit} recommendations per month. Upgrade to increase your limit.`
+      });
     }
 
     // Get Claude recommendation
