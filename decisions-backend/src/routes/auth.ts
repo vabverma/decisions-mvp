@@ -26,11 +26,11 @@ interface AuthRequest extends Request {
 }
 
 function getJwtSecret(): string {
-  const secret = process.env.JWT_SECRET;
-  if (typeof secret !== 'string') {
+  const secret: string | undefined = process.env.JWT_SECRET;
+  if (!secret) {
     throw new Error('JWT_SECRET not configured');
   }
-  return secret;
+  return secret as any as string;
 }
 
 router.post('/register', authLimiter, async (req: AuthRequest, res: Response) => {
