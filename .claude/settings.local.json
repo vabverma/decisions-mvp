@@ -268,7 +268,8 @@
       "Bash(elixir --version)",
       "Bash(erlang --version)",
       "Bash(/opt/homebrew/bin/python3.12 -m pip install --upgrade pip setuptools wheel)",
-      "Bash(/opt/homebrew/bin/python3.12 -m venv /Users/Owner/Desktop/Vibe-Trading/venv)"
+      "Bash(/opt/homebrew/bin/python3.12 -m venv /Users/Owner/Desktop/Vibe-Trading/venv)",
+      "Bash(cat ~/.claude/settings.json 2>/dev/null | head -50)"
     ]
   }
 }
