@@ -17,17 +17,7 @@ initSentry();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS configuration
-const corsOptions: cors.CorsOptions = {
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: false,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
-
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
