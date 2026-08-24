@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 interface IntegrationsProps {
   token: string;
@@ -23,10 +23,9 @@ export default function Integrations({ token }: IntegrationsProps) {
     setMessage('');
 
     try {
-      await axios.post(
-        '/api/integrations/shopify/connect',
-        { storeUrl: shopifyUrl, accessToken: shopifyToken },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.post(
+        '/integrations/shopify/connect',
+        { storeUrl: shopifyUrl, accessToken: shopifyToken }
       );
       setMessage('✅ Shopify connected successfully!');
       setShopifyUrl('');
@@ -45,10 +44,9 @@ export default function Integrations({ token }: IntegrationsProps) {
     setMessage('');
 
     try {
-      await axios.post(
-        '/api/integrations/n8n/connect',
-        { webhookUrl: n8nWebhook },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.post(
+        '/integrations/n8n/connect',
+        { webhookUrl: n8nWebhook }
       );
       setMessage('✅ n8n webhook connected successfully!');
       setN8nWebhook('');
@@ -66,10 +64,9 @@ export default function Integrations({ token }: IntegrationsProps) {
     setMessage('');
 
     try {
-      await axios.post(
-        '/api/integrations/plausible/connect',
-        { siteId: plausibleSiteId, apiKey: plausibleApiKey },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.post(
+        '/integrations/plausible/connect',
+        { siteId: plausibleSiteId, apiKey: plausibleApiKey }
       );
       setMessage('✅ Plausible connected successfully!');
       setPlausibleSiteId('');

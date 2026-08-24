@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 interface DashboardProps {
   token: string;
@@ -30,9 +30,7 @@ export default function Dashboard({ token }: DashboardProps) {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await axios.get('/api/analytics/dashboard', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await api.get('/analytics/dashboard');
         setData(response.data);
       } catch (err) {
         setError('Failed to load dashboard data');

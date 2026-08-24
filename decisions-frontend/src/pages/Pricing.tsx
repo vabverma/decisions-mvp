@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 interface PricingProps {
   token: string;
@@ -63,10 +63,9 @@ export default function Pricing({ token }: PricingProps) {
     setError('');
 
     try {
-      const response = await axios.post(
-        '/api/billing/create-checkout',
-        { planType },
-        { headers: { Authorization: `Bearer ${token}` } }
+      const response = await api.post(
+        '/billing/create-checkout',
+        { planType }
       );
 
       if (response.data.url) {

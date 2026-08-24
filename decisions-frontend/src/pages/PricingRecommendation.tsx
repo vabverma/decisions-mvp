@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 interface PricingRecommendationProps {
   token: string;
@@ -36,8 +36,8 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
     setRecommendation(null);
 
     try {
-      const response = await axios.post(
-        '/api/decisions/pricing',
+      const response = await api.post(
+        '/decisions/pricing',
         {
           productName,
           currentPrice: parseFloat(currentPrice),
@@ -46,9 +46,6 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
           monthlyVolume: parseInt(monthlyVolume),
           demandTrend,
           customerFeedback,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
