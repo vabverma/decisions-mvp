@@ -17,25 +17,16 @@ initSentry();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configure CORS to allow all origins (Render deployment)
-app.use(cors({
+// CORS configuration
+const corsOptions: cors.CorsOptions = {
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  credentials: false,
   allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+};
 
-// Explicit CORS headers for all responses
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
