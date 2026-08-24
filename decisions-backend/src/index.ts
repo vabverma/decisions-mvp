@@ -21,6 +21,12 @@ process.on('unhandledRejection', (reason) => {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Render sits in front of this app behind a reverse proxy; trust the first
+// hop so req.ip and express-rate-limit see the real client IP instead of
+// Render's internal LB address (and so express-rate-limit doesn't reject
+// the X-Forwarded-For header it sees).
+app.set('trust proxy', 1);
+
 const ALLOWED_ORIGINS = [
   process.env.DASHBOARD_URL,
   process.env.APP_URL,
