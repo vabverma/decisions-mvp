@@ -75,7 +75,7 @@ router.post('/register', authLimiter, async (req: AuthRequest, res: Response) =>
     if (!jwtSecret) {
       return res.status(500).json({ error: 'Server configuration error' });
     }
-    const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret);
+    const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret!);
 
     res.json({ user, token });
   } catch (error: any) {
@@ -106,7 +106,7 @@ router.post('/login', authLimiter, async (req: AuthRequest, res: Response) => {
     if (!jwtSecret) {
       return res.status(500).json({ error: 'Server configuration error' });
     }
-    const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret);
+    const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret!);
     res.json({ user: { id: user.id, email: user.email, subscription_tier: user.subscription_tier }, token });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
