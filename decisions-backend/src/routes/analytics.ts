@@ -1,0 +1,77 @@
+import express, { Request, Response } from 'express';
+import { pool } from '../db/init';
+import { verifyToken } from '../middleware/auth';
+
+const router = express.Router();
+
+// Get user's dashboard metrics
+router.get('/dashboard', verifyToken, async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+
+  try {
+    // Get recommendation stats
+    const recStats = await pool.query(
+      `SELECT
+        COUNT(*) as total_recommendations,
+        COUNT(CASE WHEN status = 'implemented' THEN 1 END) as implemented,
+        AVG(annual_impact) as avg_annual_impact,
+        SUM(annual_impact) as total_impact
+       FROM recommendations
+       WHERE user_id = $1`,
+      [userId]
+    );
+
+    // Get recent recommendations
+    const recent = await pool.query(
+      `SELECT r.id, p.product_name, r.recommended_price, r.annual_impact, r.created_at
+       FROM recommendations r
+       JOIN products p ON r.product_id = p.id
+       WHERE r.user_id = $1
+       ORDER BY r.created_at DESC
+       LIMIT 5`,
+      [userId]
+    );
+
+    // Get subscription info
+    const userResult = await pool.query(
+      `SELECT subscription_tier FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    res.json({
+      stats: recStats.rows[0],
+      recentRecommendations: recent.rows,
+      subscriptionTier: userResult.rows[0]?.subscription_tier,
+    });
+  } catch (error) {
+    console.error('Dashboard analytics error:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics' });
+  }
+});
+
+// Track revenue from recommendation
+router.post('/track', verifyToken, async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  const { recommendationId, actualPrice, actualVolume, actualRevenue } = req.body;
+
+  try {
+    await pool.query(
+      `INSERT INTO revenue_tracking (user_id, recommendation_id, actual_price, actual_volume, actual_revenue)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [userId, recommendationId, actualPrice, actualVolume, actualRevenue]
+    );
+
+    // Update recommendation status
+    await pool.query(
+      `UPDATE recommendations SET status = 'tracking' WHERE id = $1`,
+      [recommendationId]
+    );
+
+    res.json({ status: 'tracked' });
+  } catch (error) {
+    console.error('Revenue tracking error:', error);
+    res.status(500).json({ error: 'Failed to track revenue' });
+  }
+});
+
+export default router;

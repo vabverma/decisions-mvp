@@ -1,0 +1,38 @@
+{
+  "name": "decisions-backend",
+  "version": "1.0.0",
+  "description": "AI-powered decision-making platform for e-commerce businesses",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest",
+    "migrate": "node dist/db/migrate.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "*",
+    "@sentry/node": "*",
+    "axios": "*",
+    "bcryptjs": "*",
+    "cors": "*",
+    "dotenv": "*",
+    "express": "*",
+    "jsonwebtoken": "*",
+    "pg": "*",
+    "stripe": "*",
+    "typescript": "*",
+    "uuid": "*"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.11",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.10.6",
+    "@types/pg": "^8.11.2",
+    "jest": "^29.7.0",
+    "tsx": "^4.7.0"
+  }
+}

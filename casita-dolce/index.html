@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casita Dolce — Atlanta Luxury Snack Carts</title>
+<meta name="description" content="Casita Dolce is Atlanta's luxury snack cart experience — beautifully styled carts for weddings, quinceañeras, corporate events, birthdays and baby showers.">
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --espresso:#2B211C;
+    --espresso-deep:#1E1611;
+    --cream:#F5EFE6;
+    --ivory:#FBF7F0;
+    --caramel:#C08A4E;
+    --caramel-deep:#A9713A;
+    --gold:#D9B872;
+    --mocha:#5A4A3F;
+    --mocha-soft:#8A7A6E;
+    --line:rgba(43,33,28,.14);
+    --line-gold:rgba(217,184,114,.45);
+    --maxw:1200px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--cream);
+    color:var(--espresso);
+    font-family:"Inter",system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;display:block}
+  a{color:inherit;text-decoration:none}
+
+  h1,h2,h3,.display{
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:600;
+    line-height:1.02;
+    letter-spacing:-.01em;
+    font-optical-sizing:auto;
+  }
+
+  .eyebrow{
+    font-family:"Inter",sans-serif;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.34em;
+    text-transform:uppercase;
+    color:var(--caramel-deep);
+    display:inline-flex;
+    align-items:center;
+    gap:.7em;
+  }
+  .eyebrow::before{
+    content:"";
+    width:26px;height:1px;
+    background:var(--caramel);
+    display:inline-block;
+  }
+  .eyebrow.center::before{display:none}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  .section{padding:120px 0}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;gap:.6em;
+    font-family:"Inter",sans-serif;
+    font-size:.74rem;font-weight:600;
+    letter-spacing:.2em;text-transform:uppercase;
+    padding:16px 30px;border:1px solid currentColor;
+    border-radius:0;
+    transition:all .35s var(--ease);
+    cursor:pointer;background:transparent;
+  }
+  .btn .arw{transition:transform .35s var(--ease)}
+  .btn:hover .arw{transform:translateX(5px)}
+  .btn-solid{background:var(--caramel);color:var(--espresso-deep);border-color:var(--caramel)}
+  .btn-solid:hover{background:var(--gold);border-color:var(--gold)}
+  .btn-ghost-light{color:var(--cream)}
+  .btn-ghost-light:hover{background:var(--cream);color:var(--espresso)}
+  .btn-ghost-dark{color:var(--espresso)}
+  .btn-ghost-dark:hover{background:var(--espresso);color:var(--cream)}
+
+  /* ---------- Nav ---------- */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(245,239,230,.82);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    transition:background .3s;
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    height:74px;max-width:var(--maxw);margin:0 auto;padding:0 32px;
+  }
+  .brand{display:flex;flex-direction:row;align-items:center;gap:13px;line-height:1;margin-right:auto}
+  .logo-mark{width:42px;height:auto;flex:0 0 auto;display:block}
+  .brand-text{display:flex;flex-direction:column;line-height:1}
+  .brand .name{
+    font-family:"Fraunces",serif;font-weight:600;font-size:1.32rem;
+    letter-spacing:.01em;
+  }
+  .brand .tag{
+    font-size:.56rem;font-weight:600;letter-spacing:.36em;
+    text-transform:uppercase;color:var(--caramel-deep);margin-top:3px;
+  }
+  .nav-links{display:flex;align-items:center;gap:26px}
+  .nav-links a.link{
+    font-size:.76rem;font-weight:500;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--mocha);white-space:nowrap;
+    transition:color .25s;
+  }
+  .nav-links a.link:hover{color:var(--espresso)}
+  .nav-cta{padding:12px 22px;font-size:.68rem}
+  .burger{display:none;background:none;border:0;cursor:pointer;flex-direction:column;gap:5px}
+  .burger span{width:24px;height:2px;background:var(--espresso);display:block;transition:.3s}
+  .lang{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:5px;margin-left:20px;line-height:1}
+  .lang-note{display:inline-flex;align-items:center;gap:5px;font-size:.53rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mocha-soft);white-space:nowrap}
+  .lang-globe{width:13px;height:13px;color:var(--mocha-soft);flex:0 0 auto}
+  .lang-toggle{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lang-toggle button{
+    font-family:"Inter",sans-serif;font-size:.64rem;font-weight:600;letter-spacing:.12em;
+    padding:7px 12px;background:transparent;border:0;color:var(--mocha);text-transform:uppercase;
+    transition:background .25s,color .25s;
+  }
+  .lang-toggle button.active{background:var(--espresso);color:var(--cream)}
+  @media(max-width:900px){ .lang-note{display:none} }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    display:grid;grid-template-columns:1.05fr .95fr;
+    min-height:calc(100vh - 74px);
+    background:var(--espresso-deep);
+  }
+  .hero-copy{
+    color:var(--cream);
+    padding:clamp(48px,7vw,100px);
+    display:flex;flex-direction:column;justify-content:center;
+    position:relative;
+  }
+  .hero-copy .eyebrow{color:var(--gold)}
+  .hero-copy .eyebrow::before{background:var(--gold)}
+  .hero h1{
+    font-size:clamp(2.9rem,6.2vw,5.4rem);
+    font-weight:600;margin:26px 0 0;
+    color:var(--ivory);
+  }
+  .hero h1 em{
+    font-style:italic;font-weight:500;color:var(--gold);
+  }
+  .hero-sub{
+    color:rgba(245,239,230,.72);
+    font-size:1.06rem;max-width:34ch;margin:26px 0 40px;
+  }
+  .hero-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .hero-phone{
+    margin-top:34px;display:flex;align-items:center;gap:14px;
+    font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;
+    color:rgba(245,239,230,.6);
+  }
+  .hero-phone b{color:var(--gold);font-weight:600;letter-spacing:.08em}
+
+  /* Arched image panel = the "casita" doorway signature */
+  .hero-visual{
+    position:relative;
+    background:
+      radial-gradient(120% 90% at 70% 20%, #3a2c23 0%, var(--espresso) 55%, var(--espresso-deep) 100%);
+    display:flex;align-items:flex-end;justify-content:center;
+    padding:56px 56px 0;
+    overflow:hidden;
+  }
+  .arch{
+    position:relative;
+    width:100%;max-width:440px;height:88%;
+    border-radius:220px 220px 0 0;
+    border:1px solid var(--line-gold);
+    background:
+      linear-gradient(180deg, rgba(192,138,78,.18), rgba(30,22,17,.55)),
+      repeating-linear-gradient(135deg, rgba(217,184,114,.06) 0 2px, transparent 2px 22px);
+    box-shadow:0 -30px 90px rgba(0,0,0,.35) inset;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;color:rgba(245,239,230,.5);
+    overflow:hidden;
+  }
+  .arch::after{
+    content:"";position:absolute;inset:14px 14px 0;
+    border-radius:200px 200px 0 0;
+    border:1px solid rgba(217,184,114,.22);
+    pointer-events:none;
+  }
+  .arch .ph-icon{font-size:2rem;margin-bottom:14px;opacity:.7}
+  .arch .ph-note{
+    font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;
+    max-width:20ch;line-height:1.7;
+  }
+  /* When a real photo is dropped in: give .arch a background-image + class .has-photo */
+  .arch.has-photo{background-size:cover;background-position:center}
+  .arch.has-photo .ph-icon,.arch.has-photo .ph-note{display:none}
+
+  /* ---------- Marquee strip ---------- */
+  .strip{
+    background:var(--espresso);color:var(--cream);
+    border-top:1px solid var(--line-gold);
+    border-bottom:1px solid var(--line-gold);
+    overflow:hidden;padding:20px 0;
+  }
+  .strip-track{
+    display:flex;gap:60px;white-space:nowrap;width:max-content;
+    animation:scroll 34s linear infinite;
+  }
+  .strip-track span{
+    font-family:"Fraunces",serif;font-style:italic;
+    font-size:1.15rem;color:rgba(245,239,230,.82);
+    display:inline-flex;align-items:center;gap:60px;
+  }
+  .strip-track span::after{content:"✦";color:var(--caramel);font-style:normal;font-size:.7rem}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* ---------- Intro / about ---------- */
+  .intro{background:var(--ivory)}
+  .intro-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:80px;align-items:center}
+  .intro h2{
+    font-size:clamp(2rem,3.6vw,3.1rem);font-weight:500;
+    line-height:1.08;
+  }
+  .intro h2 em{font-style:italic;color:var(--caramel-deep)}
+  .intro p{color:var(--mocha);margin-top:24px;max-width:52ch}
+  .intro p + p{margin-top:18px}
+  .intro .signoff{
+    margin-top:30px;font-family:"Fraunces",serif;font-style:italic;
+    font-size:1.15rem;color:var(--espresso);
+  }
+  .stat-col{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+  .stat{
+    display:flex;align-items:baseline;gap:22px;
+    padding:26px 0;border-bottom:1px solid var(--line);
+  }
+  .stat .num{
+    font-family:"Fraunces",serif;font-size:2.6rem;font-weight:600;
+    color:var(--caramel-deep);min-width:110px;line-height:1;
+  }
+  .stat .lbl{font-size:.95rem;color:var(--mocha)}
+  .stat .lbl b{display:block;color:var(--espresso);font-weight:600;font-size:1.02rem;margin-bottom:2px}
+
+  /* ---------- Occasions ---------- */
+  .occ-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;margin-bottom:56px}
+  .occ-head h2{font-size:clamp(2rem,3.8vw,3.2rem);font-weight:500;max-width:16ch}
+  .occ-head h2 em{font-style:italic;color:var(--caramel-deep)}
+  .occ-head p{color:var(--mocha);max-width:34ch}
+  .occ-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .occ-card{
+    border:1px solid var(--line);background:var(--ivory);
+    padding:38px 32px;min-height:260px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    transition:transform .4s var(--ease),background .4s,border-color .4s,color .4s;
+  }
+  .occ-card:hover{background:var(--espresso);color:var(--cream);transform:translateY(-6px);border-color:var(--espresso)}
+  .occ-card .idx{
+    font-family:"Fraunces",serif;font-size:.9rem;color:var(--caramel-deep);
+    letter-spacing:.1em;
+  }
+  .occ-card:hover .idx{color:var(--gold)}
+  .occ-card h3{font-size:1.7rem;font-weight:600;margin-top:auto}
+  .occ-card p{font-size:.92rem;color:var(--mocha);margin-top:12px}
+  .occ-card:hover p{color:rgba(245,239,230,.72)}
+
+  /* ---------- The Carte (signature menu) ---------- */
+  .carte{background:var(--espresso-deep);color:var(--cream)}
+  .carte .eyebrow{color:var(--gold)}
+  .carte .eyebrow::before{background:var(--gold)}
+  .carte-head{text-align:center;margin-bottom:64px}
+  .carte-head h2{
+    font-size:clamp(2.2rem,4.4vw,3.6rem);font-weight:500;
+    margin-top:20px;color:var(--ivory);
+  }
+  .carte-head h2 em{font-style:italic;color:var(--gold)}
+  .carte-head p{color:rgba(245,239,230,.62);max-width:48ch;margin:20px auto 0}
+  .carte-list{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+  .carte-item{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:20px;
+    padding:22px 8px;border-bottom:1px solid rgba(217,184,114,.16);
+  }
+  .carte-item .no{
+    font-family:"Fraunces",serif;font-size:.85rem;color:var(--caramel);
+    font-variant-numeric:tabular-nums;
+  }
+  .carte-item .name{
+    font-family:"Fraunces",serif;font-size:1.5rem;font-weight:500;color:var(--ivory);
+    position:relative;
+  }
+  .carte-item .name small{
+    display:block;font-family:"Inter",sans-serif;font-size:.82rem;font-weight:400;
+    color:rgba(245,239,230,.5);letter-spacing:.02em;margin-top:5px;
+  }
+  .carte-item .tag{
+    font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--gold);white-space:nowrap;border:1px solid var(--line-gold);
+    padding:6px 12px;
+  }
+  .carte-note{
+    text-align:center;margin-top:44px;font-size:.86rem;
+    color:rgba(245,239,230,.5);letter-spacing:.04em;
+  }
+  .carte-note b{color:var(--gold);font-weight:600}
+
+  /* ---------- Process ---------- */
+  .proc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+  .proc-step{padding:44px 34px 44px 0;border-right:1px solid var(--line)}
+  .proc-step:last-child{border-right:0;padding-right:0}
+  .proc-step .step-no{
+    font-family:"Fraunces",serif;font-size:.8rem;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--caramel-deep);
+  }
+  .proc-step h3{font-size:1.5rem;font-weight:600;margin:20px 0 12px}
+  .proc-step p{color:var(--mocha);font-size:.96rem}
+
+  /* ---------- Gallery ---------- */
+  .gallery{background:var(--ivory)}
+  .gal-head{text-align:center;margin-bottom:56px}
+  .gal-head h2{font-size:clamp(2rem,3.8vw,3.2rem);font-weight:500;margin-top:18px}
+  .gal-head h2 em{font-style:italic;color:var(--caramel-deep)}
+  /* Animated arched-photo showcase (echoes the hero arch) */
+  .gal-viewport{
+    position:relative;overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  }
+  .gal-track{display:flex;gap:26px;width:max-content;animation:galscroll 50s linear infinite}
+  .gal-viewport:hover .gal-track{animation-play-state:paused}
+  @keyframes galscroll{to{transform:translateX(-50%)}}
+  .gal-card{
+    position:relative;flex:0 0 auto;width:300px;height:430px;
+    border-radius:200px 200px 8px 8px;overflow:hidden;
+    border:1px solid var(--line-gold);
+    box-shadow:0 18px 44px rgba(30,22,17,.20);
+    transition:transform .5s var(--ease),box-shadow .5s;
+  }
+  .gal-card img{
+    width:100%;height:100%;object-fit:cover;display:block;
+    transform:scale(1.05);transition:transform 6s var(--ease);
+  }
+  .gal-card .frame{
+    position:absolute;inset:9px;z-index:2;pointer-events:none;
+    border:1px solid rgba(217,184,114,.4);border-radius:190px 190px 5px 5px;
+  }
+  .gal-card::after{
+    content:"";position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,transparent 52%,rgba(24,17,12,.72));
+  }
+  .gal-card .cap{
+    position:absolute;left:0;right:0;bottom:24px;z-index:3;text-align:center;padding:0 18px;
+    color:rgba(245,239,230,.85);font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;
+    opacity:0;transform:translateY(10px);transition:opacity .5s var(--ease),transform .5s var(--ease);
+  }
+  .gal-card .cap b{
+    display:block;font-family:"Fraunces",serif;font-style:italic;font-weight:500;
+    text-transform:none;letter-spacing:0;font-size:1.2rem;color:var(--gold);margin-bottom:5px;
+  }
+  .gal-card:hover{transform:translateY(-8px) scale(1.015);box-shadow:0 30px 64px rgba(30,22,17,.34)}
+  .gal-card:hover img{transform:scale(1.14)}
+  .gal-card:hover .cap{opacity:1;transform:none}
+
+  /* ---------- Testimonial ---------- */
+  .quote-sec{background:var(--cream);text-align:center}
+  .quote-sec .mark{font-family:"Fraunces",serif;font-size:4rem;color:var(--caramel);line-height:.5}
+  .quote-sec blockquote{
+    font-family:"Fraunces",serif;font-weight:400;font-style:italic;
+    font-size:clamp(1.6rem,3.2vw,2.5rem);line-height:1.28;
+    max-width:22ch;margin:26px auto 0;color:var(--espresso);
+  }
+  .quote-sec .cite{
+    margin-top:32px;font-size:.76rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--mocha);
+  }
+  .quote-sec .cite b{color:var(--caramel-deep)}
+
+  /* ---------- CTA / Request ---------- */
+  .request{background:var(--espresso);color:var(--cream)}
+  .req-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
+  .request .eyebrow{color:var(--gold)}
+  .request .eyebrow::before{background:var(--gold)}
+  .request h2{font-size:clamp(2.2rem,4vw,3.4rem);font-weight:500;margin-top:20px;color:var(--ivory)}
+  .request h2 em{font-style:italic;color:var(--gold)}
+  .request .lead{color:rgba(245,239,230,.68);margin-top:22px;max-width:40ch}
+  .req-contact{margin-top:40px;display:flex;flex-direction:column;gap:18px}
+  .req-contact a,.req-contact div{
+    display:flex;align-items:center;gap:14px;
+    font-size:.82rem;letter-spacing:.1em;color:rgba(245,239,230,.82);
+  }
+  .req-contact .k{
+    font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);
+    min-width:70px;
+  }
+  form.quote-form{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  form.quote-form .full{grid-column:1/-1}
+  .field label{
+    display:block;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--gold);margin-bottom:8px;
+  }
+  .field input,.field select,.field textarea{
+    width:100%;background:transparent;border:0;border-bottom:1px solid rgba(217,184,114,.35);
+    color:var(--cream);font-family:"Inter",sans-serif;font-size:.98rem;
+    padding:10px 2px;transition:border-color .3s;
+  }
+  .field textarea{resize:vertical;min-height:70px}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+  .field select option{color:#000}
+  .field ::placeholder{color:rgba(245,239,230,.35)}
+  form.quote-form .btn{margin-top:8px;justify-content:center}
+
+  /* ---------- Footer ---------- */
+  footer.site{background:var(--espresso-deep);color:rgba(245,239,230,.6);padding:70px 0 40px}
+  .foot-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40px;padding-bottom:44px;border-bottom:1px solid rgba(217,184,114,.16)}
+  .foot-logo{width:56px;height:auto;display:block;margin-bottom:16px}
+  .foot-brand .name{font-family:"Fraunces",serif;font-size:1.8rem;color:var(--ivory);font-weight:600}
+  .foot-brand .tag{font-size:.6rem;letter-spacing:.34em;text-transform:uppercase;color:var(--caramel);margin-top:6px}
+  .foot-brand p{margin-top:18px;max-width:30ch;font-size:.9rem}
+  .foot-cols{display:flex;gap:70px;flex-wrap:wrap}
+  .foot-col h4{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+  .foot-col a,.foot-col p{display:block;font-size:.9rem;margin-bottom:10px;transition:color .25s}
+  .foot-col a:hover{color:var(--ivory)}
+  .foot-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-top:36px;font-size:.74rem;letter-spacing:.06em}
+
+  /* ---------- Custom cart cursor (fine pointers only) ---------- */
+  #cartCursor{
+    position:fixed;left:0;top:0;width:42px;margin-left:-21px;margin-top:-19px;
+    pointer-events:none;z-index:99999;opacity:0;transition:opacity .18s var(--ease);
+    will-change:transform;
+  }
+  #cartCursor svg{width:100%;height:auto;display:block;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.35)) drop-shadow(0 0 1px rgba(255,255,255,.4));
+    transition:transform .12s var(--ease);
+  }
+  #cartCursor.press svg{transform:scale(.88)}
+  #cartCursor .wheel{
+    transform-box:fill-box;transform-origin:center;
+    animation:cartspin .6s linear infinite;animation-play-state:paused;
+  }
+  #cartCursor.rolling .wheel{animation-play-state:running}
+  @keyframes cartspin{to{transform:rotate(360deg)}}
+  @media (hover:hover) and (pointer:fine){
+    html.cart-cursor, html.cart-cursor *{cursor:none}
+    html.cart-cursor input, html.cart-cursor textarea{cursor:text}
+    html.cart-cursor select, html.cart-cursor option{cursor:pointer}
+  }
+  @media (hover:none),(pointer:coarse){ #cartCursor{display:none} }
+
+  /* ---------- Reveal animation ---------- */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- Responsive ---------- */
+  @media(max-width:960px){
+    .hero{grid-template-columns:1fr;min-height:auto}
+    .hero-visual{min-height:52vh;order:-1;padding:40px 40px 0}
+    .arch{height:100%;max-width:360px}
+    .intro-grid{grid-template-columns:1fr;gap:44px}
+    .occ-grid{grid-template-columns:1fr 1fr}
+    .proc-grid{grid-template-columns:1fr}
+    .proc-step{border-right:0;border-bottom:1px solid var(--line);padding:34px 0}
+    .proc-step:last-child{border-bottom:0}
+    .gal-grid{grid-template-columns:1fr 1fr}
+    .gal-item.tall{grid-row:auto;aspect-ratio:3/4}
+    .req-grid{grid-template-columns:1fr;gap:44px}
+  }
+  @media(max-width:640px){
+    .section{padding:80px 0}
+    .wrap{padding:0 22px}
+    .nav-links{
+      position:fixed;inset:74px 0 auto;flex-direction:column;gap:0;
+      background:var(--cream);border-bottom:1px solid var(--line);
+      padding:14px 22px 24px;transform:translateY(-120%);transition:transform .4s var(--ease);
+      align-items:stretch;
+    }
+    .nav-links.open{transform:none}
+    .nav-links a.link{padding:14px 0;border-bottom:1px solid var(--line)}
+    .nav-cta{margin-top:14px;justify-content:center}
+    .burger{display:flex}
+    .occ-grid{grid-template-columns:1fr}
+    .gal-grid{grid-template-columns:1fr 1fr}
+    form.quote-form{grid-template-columns:1fr}
+    .carte-item{grid-template-columns:auto 1fr;gap:14px}
+    .carte-item .tag{grid-column:2;justify-self:start;margin-top:6px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;scroll-behavior:auto}
+    .reveal{opacity:1;transform:none;transition:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CART CURSOR -->
+<div id="cartCursor" aria-hidden="true">
+  <svg viewBox="0 0 56 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="28" cy="5" r="1.6" fill="#C08A4E"/>
+    <path d="M28 6 V26" stroke="#C08A4E" stroke-width="2" stroke-linecap="round"/>
+    <path d="M9 19 C9 9 19 7 28 7 C37 7 47 9 47 19" stroke="#C08A4E" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M9 19 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0" stroke="#D9B872" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="14" y="26" width="28" height="13" rx="3" stroke="#C08A4E" stroke-width="2.2"/>
+    <path d="M16 31 H40" stroke="#D9B872" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M21 39 V41 M35 39 V41" stroke="#C08A4E" stroke-width="2" stroke-linecap="round"/>
+    <g class="wheel"><circle cx="21" cy="44" r="3" stroke="#C08A4E" stroke-width="1.9"/><path d="M21 41.4 V46.6 M18.4 44 H23.6" stroke="#D9B872" stroke-width="1.2" stroke-linecap="round"/></g>
+    <g class="wheel"><circle cx="35" cy="44" r="3" stroke="#C08A4E" stroke-width="1.9"/><path d="M35 41.4 V46.6 M32.4 44 H37.6" stroke="#D9B872" stroke-width="1.2" stroke-linecap="round"/></g>
+  </svg>
+</div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand" aria-label="Casita Dolce home">
+      <svg class="logo-mark" viewBox="0 0 56 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="28" cy="5" r="1.6" fill="#C08A4E"/>
+        <path d="M28 6 V26" stroke="#C08A4E" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9 19 C9 9 19 7 28 7 C37 7 47 9 47 19" stroke="#C08A4E" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M9 19 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0" stroke="#D9B872" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="14" y="26" width="28" height="13" rx="3" stroke="#C08A4E" stroke-width="2.2"/>
+        <path d="M16 31 H40" stroke="#D9B872" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M21 39 V41 M35 39 V41" stroke="#C08A4E" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="21" cy="44" r="3" stroke="#C08A4E" stroke-width="1.9"/>
+        <circle cx="35" cy="44" r="3" stroke="#C08A4E" stroke-width="1.9"/>
+      </svg>
+      <span class="brand-text">
+        <span class="name">Casita Dolce</span>
+        <span class="tag" data-es="Carritos de Snacks de Lujo · Atlanta">Atlanta Luxury Snack Carts</span>
+      </span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a class="link" href="#occasions" data-es="Ocasiones">Occasions</a>
+      <a class="link" href="#carte" data-es="Los Carritos">The Carts</a>
+      <a class="link" href="#process" data-es="Cómo Funciona">How It Works</a>
+      <a class="link" href="#gallery" data-es="Galería">Gallery</a>
+      <a class="link btn btn-solid nav-cta" href="#request" data-es="Reservar Fecha">Request a Date</a>
+    </nav>
+    <div class="lang" title="Choose language · Elegir idioma">
+      <span class="lang-note">
+        <svg class="lang-globe" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M3 12h18" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 3c2.8 2.4 4.2 5.5 4.2 9s-1.4 6.6-4.2 9c-2.8-2.4-4.2-5.5-4.2-9s1.4-6.6 4.2-9Z" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        Idioma · Language
+      </span>
+      <div class="lang-toggle" role="group" aria-label="Language / Idioma">
+        <button type="button" data-lang="en" class="active">EN</button>
+        <button type="button" data-lang="es">ES</button>
+      </div>
+    </div>
+    <button class="burger" id="burger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-copy">
+    <span class="eyebrow" data-es="Desde Atlanta · Georgia">Est. in Atlanta · Georgia</span>
+    <h1 data-es="La casita más<br>dulce sobre<br><em>ruedas.</em>">The sweetest<br>little house<br>on <em>wheels.</em></h1>
+    <p class="hero-sub" data-es="Carritos de snacks de lujo, diseñados para tu celebración y llevados directo a tu evento — para que cada invitado recuerde los detalles.">Luxury snack carts, styled to your celebration and rolled straight to your event — so every guest remembers the details.</p>
+    <div class="hero-actions">
+      <a href="#request" class="btn btn-solid" data-es="Reservar Fecha <span class=&quot;arw&quot;>→</span>">Request a Date <span class="arw">→</span></a>
+      <a href="#carte" class="btn btn-ghost-light" data-es="Ver los Carritos">See the Carts</a>
+    </div>
+    <div class="hero-phone">
+      <span data-es="Reserva directo">Book direct</span>
+      <b>[ phone number ]</b>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="arch has-photo" id="heroArch" style="background-image:url('images/xime.jpg')" role="img" aria-label="Casita Dolce mangonada bar cart styled for a quinceañera">
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span>Weddings</span><span>Quinceañeras</span><span>Corporate Events</span><span>Birthdays</span><span>Baby Showers</span>
+    <span>Weddings</span><span>Quinceañeras</span><span>Corporate Events</span><span>Birthdays</span><span>Baby Showers</span>
+  </div>
+</div>
+
+<!-- INTRO -->
+<section class="section intro">
+  <div class="wrap intro-grid">
+    <div class="reveal">
+      <span class="eyebrow" data-es="Nuestra historia">Our story</span>
+      <h2 data-es="Una pequeña <em>casita</em> de dulzura, llevada hasta tu puerta.">A little <em>casita</em> of sweetness, delivered to your door.</h2>
+      <p data-es="Casita Dolce nació de una idea simple: la mesa de snacks no debería ser un detalle más — debería ser un momento. Creamos carritos de snacks bellamente decorados que convierten un rincón de tu evento en algo que los invitados rodean, fotografían y recuerdan.">Casita Dolce began with a simple idea: the snack table shouldn't be an afterthought — it should be a moment. We build beautifully styled snack carts that turn a corner of your event into something guests gather around, photograph, and remember.</p>
+      <p data-es="Cada carrito se decora a juego con tus colores y tu ocasión, atendido con cariño y servido con la calidez de un hogar. Nosotros nos encargamos del montaje, la decoración y los detalles dulces — tú disfrutas la fiesta.">Every cart is dressed to match your palette and your occasion, staffed with care, and served with the warmth of a home. We handle the setup, the styling, and the sweet details — you enjoy the party.</p>
+      <p class="signoff" data-es="— Con cariño, Casita Dolce">— With love, Casita Dolce</p>
+    </div>
+    <div class="stat-col reveal">
+      <div class="stat"><span class="num">100%</span><span class="lbl" data-es="<b>Totalmente personalizado</b>A juego con tus colores, tema y espacio."><b>Custom styled</b>Matched to your colors, theme, and space.</span></div>
+      <div class="stat"><span class="num">5+</span><span class="lbl" data-es="<b>Ocasiones que cubrimos</b>Desde quinceañeras hasta galas corporativas."><b>Occasions we cover</b>From quinceañeras to corporate galas.</span></div>
+      <div class="stat"><span class="num">ATL</span><span class="lbl" data-es="<b>Metro Atlanta y más</b>[ confirmar área de servicio ]"><b>Metro Atlanta &amp; beyond</b>[ confirm service radius ]</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- OCCASIONS -->
+<section class="section" id="occasions">
+  <div class="wrap">
+    <div class="occ-head reveal">
+      <h2 data-es="Hecho para los momentos que <em>vale la pena celebrar.</em>">Made for the moments <em>worth celebrating.</em></h2>
+      <p data-es="Sea cual sea la ocasión, diseñamos un carrito que va con el ambiente. Aquí es donde brilla Casita Dolce.">Whatever the occasion, we style a cart that fits the feeling. Here's where Casita Dolce shines.</p>
+    </div>
+    <div class="occ-grid">
+      <div class="occ-card reveal"><span class="idx">01</span><h3 data-es="Bodas">Weddings</h3><p data-es="Una elegante estación de dulces de la que tus invitados no dejarán de hablar.">An elegant sweet station your guests won't stop talking about.</p></div>
+      <div class="occ-card reveal"><span class="idx">02</span><h3 data-es="Quinceañeras">Quinceañeras</h3><p data-es="Un centro de atención digno del gran día.">A show-stopping centerpiece worthy of the big day.</p></div>
+      <div class="occ-card reveal"><span class="idx">03</span><h3 data-es="Eventos Corporativos">Corporate Events</h3><p data-es="Catering elegante y a tu marca que impresiona a clientes y equipos.">Elevated, on-brand catering that impresses clients and teams.</p></div>
+      <div class="occ-card reveal"><span class="idx">04</span><h3 data-es="Cumpleaños">Birthdays</h3><p data-es="Desde el primer añito hasta los grandes festejos, decorado según el tema.">From first birthdays to milestone bashes, styled to the theme.</p></div>
+      <div class="occ-card reveal"><span class="idx">05</span><h3 data-es="Baby Showers">Baby Showers</h3><p data-es="Tierno, dulce y perfecto para la foto, para la invitada de honor.">Soft, sweet, and picture-perfect for the guest of honor.</p></div>
+      <div class="occ-card reveal"><span class="idx">06</span><h3 data-es="Y Más">&amp; More</h3><p data-es="Graduaciones, aniversarios, lanzamientos — cuéntanos qué estás planeando.">Graduations, anniversaries, launches — tell us what you're planning.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- THE CARTE (signature) -->
+<section class="section carte" id="carte">
+  <div class="wrap">
+    <div class="carte-head reveal">
+      <span class="eyebrow center" data-es="La Carta">La Carte</span>
+      <h2 data-es="Elige tus <em>carritos.</em>">Choose your <em>carts.</em></h2>
+      <p data-es="Un menú de carritos de snacks para combinar a tu gusto. La selección final y los extras se personalizan al reservar.">A curated menu of snack carts to mix and match for your event. Final selection and add-ons are tailored during booking.</p>
+    </div>
+    <div class="carte-list">
+      <div class="carte-item reveal"><span class="no">01</span><span class="name" data-es="Barra de Fruta<small>Fresa y plátano fresco con bombón, Lucky Charms, Oreo, nueces, chispas y jarabes — chocolate, lechera y caramelo.</small>">Fruit Bar<small>Fresh strawberry &amp; banana with marshmallow, Lucky Charms, Oreo, pecans, sprinkles &amp; syrups — chocolate, lechera, caramel.</small></span><span class="tag" data-es="El Favorito">Most Loved</span></div>
+      <div class="carte-item reveal"><span class="no">02</span><span class="name" data-es="Mini Pancakes<small>Pancakes calientes en mini porciones, con jarabe y toppings al gusto de tus invitados.</small>">Mini Pancakes<small>Warm bite-size pancakes, drizzled and topped just the way your guests like them.</small></span></div>
+      <div class="carte-item reveal"><span class="no">03</span><span class="name" data-es="Esquites<small>Vasitos de elote estilo esquite, servidos calientes con todos los complementos clásicos.</small>">Esquites<small>Mexican street-corn cups, served warm with all the classic fixings.</small></span></div>
+      <div class="carte-item reveal"><span class="no">04</span><span class="name" data-es="Italian Ice<small>Refrescante hielo italiano raspado en sabores frutales y vibrantes.</small>">Italian Ice<small>Refreshing shaved Italian ice in bright, fruity flavors.</small></span><span class="tag" data-es="De Temporada">Seasonal</span></div>
+      <div class="carte-item reveal"><span class="no">05</span><span class="name" data-es="Barra de Sundaes<small>Arma tu propio sundae con fruta, toppings y ricos jarabes.</small>">Sundae Bar<small>Build-your-own sundaes with fruit, toppings and rich syrups.</small></span></div>
+      <div class="carte-item reveal"><span class="no">06</span><span class="name" data-es="Menú Temático Personalizado<small>Un carrito decorado y personalizado a tu evento — desde la elegancia de una quinceañera hasta tu tema favorito.</small>">Custom Themed Menu<small>A cart styled and branded to your event — from quinceañera elegance to your favorite theme.</small></span></div>
+    </div>
+    <p class="carte-note" data-es="Los paquetes desde <b>[ precio inicial ]</b> · Cotizaciones personalizadas para cada evento.">Packages start at <b>[ starting price ]</b> · Custom quotes for every event.</p>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="section" id="process">
+  <div class="wrap">
+    <div class="occ-head reveal" style="margin-bottom:44px">
+      <h2 data-es="Cómo llega la <em>dulzura.</em>">How the sweetness <em>arrives.</em></h2>
+      <p data-es="Tres pasos sencillos, desde el primer mensaje hasta el momento en que tus invitados se reúnen.">Three easy steps from first message to the moment your guests gather round.</p>
+    </div>
+    <div class="proc-grid">
+      <div class="proc-step reveal"><span class="step-no" data-es="Paso Uno">Step One</span><h3 data-es="Cuéntanos">Tell us about it</h3><p data-es="Comparte tu fecha, número de invitados, ubicación y el estilo que sueñas. Revisamos disponibilidad y te enviamos una cotización personalizada.">Share your date, guest count, location, and the vibe you're dreaming of. We'll check availability and send a custom quote.</p></div>
+      <div class="proc-step reveal"><span class="step-no" data-es="Paso Dos">Step Two</span><h3 data-es="Lo diseñamos">We style it</h3><p data-es="Elige tus carritos y diseñamos el montaje a juego con tus colores y tema — hasta el más dulce detalle.">Pick your carts and we design the setup to match your colors and theme — down to the sweetest little details.</p></div>
+      <div class="proc-step reveal"><span class="step-no" data-es="Paso Tres">Step Three</span><h3 data-es="Llegamos rodando">We roll in</h3><p data-es="El día del evento llegamos, montamos, servimos con cariño y recogemos todo. Tú solo disfruta la fiesta.">On the day, we arrive, set up, serve with care, and pack it all away. You just enjoy the party.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="section gallery" id="gallery">
+  <div class="wrap">
+    <div class="gal-head reveal">
+      <span class="eyebrow center" data-es="Los momentos">The moments</span>
+      <h2 data-es="Momentos dulces, <em>bellamente servidos.</em>">Sweet moments, <em>beautifully served.</em></h2>
+    </div>
+  </div>
+  <div class="gal-viewport reveal">
+    <div class="gal-track">
+      <figure class="gal-card"><img src="images/dia-especial.jpg" alt="Quinceañera holding a Casita Dolce dessert cup"><span class="frame"></span><figcaption class="cap" data-es="<b>Quinceañera</b>El detalle más dulce"><b>Quinceañera</b>The sweetest little detail</figcaption></figure>
+      <figure class="gal-card"><img src="images/christian-bday.jpg" alt="Fruit Bar and Mini Pancakes carts set up at a birthday"><span class="frame"></span><figcaption class="cap" data-es="<b>Cumpleaños</b>Barra de Fruta y Mini Pancakes"><b>Birthday</b>Fruit Bar &amp; Mini Pancakes</figcaption></figure>
+      <figure class="gal-card"><img src="images/verah-bday.jpg" alt="Italian Ice and Sundae Bar cart with custom menu"><span class="frame"></span><figcaption class="cap" data-es="<b>Sweet Sixteen</b>Italian Ice y Barra de Sundaes"><b>Sweet Sixteen</b>Italian Ice &amp; Sundae Bar</figcaption></figure>
+      <figure class="gal-card"><img src="images/historia.jpg" alt="Mini pancakes cart styled for a child's birthday"><span class="frame"></span><figcaption class="cap" data-es="<b>Fiesta Infantil</b>Mini Pancakes Palace"><b>Kids' Party</b>Mini Pancakes Palace</figcaption></figure>
+      <figure class="gal-card"><img src="images/wedding.jpg" alt="Wedding celebration served by Casita Dolce"><span class="frame"></span><figcaption class="cap" data-es="<b>Boda</b>Un día para recordar"><b>Wedding</b>A day to remember</figcaption></figure>
+      <figure class="gal-card"><img src="images/abigail-xv.jpg" alt="Quinceañera setup and desserts by Casita Dolce"><span class="frame"></span><figcaption class="cap" data-es="<b>Quinceañera</b>Decorado según el tema"><b>Quinceañera</b>Styled to the theme</figcaption></figure>
+      <figure class="gal-card" aria-hidden="true"><img src="images/dia-especial.jpg" alt=""><span class="frame"></span><figcaption class="cap" data-es="<b>Quinceañera</b>El detalle más dulce"><b>Quinceañera</b>The sweetest little detail</figcaption></figure>
+      <figure class="gal-card" aria-hidden="true"><img src="images/christian-bday.jpg" alt=""><span class="frame"></span><figcaption class="cap" data-es="<b>Cumpleaños</b>Barra de Fruta y Mini Pancakes"><b>Birthday</b>Fruit Bar &amp; Mini Pancakes</figcaption></figure>
+      <figure class="gal-card" aria-hidden="true"><img src="images/verah-bday.jpg" alt=""><span class="frame"></span><figcaption class="cap" data-es="<b>Sweet Sixteen</b>Italian Ice y Barra de Sundaes"><b>Sweet Sixteen</b>Italian Ice &amp; Sundae Bar</figcaption></figure>
+      <figure class="gal-card" aria-hidden="true"><img src="images/historia.jpg" alt=""><span class="frame"></span><figcaption class="cap" data-es="<b>Fiesta Infantil</b>Mini Pancakes Palace"><b>Kids' Party</b>Mini Pancakes Palace</figcaption></figure>
+      <figure class="gal-card" aria-hidden="true"><img src="images/wedding.jpg" alt=""><span class="frame"></span><figcaption class="cap" data-es="<b>Boda</b>Un día para recordar"><b>Wedding</b>A day to remember</figcaption></figure>
+      <figure class="gal-card" aria-hidden="true"><img src="images/abigail-xv.jpg" alt=""><span class="frame"></span><figcaption class="cap" data-es="<b>Quinceañera</b>Decorado según el tema"><b>Quinceañera</b>Styled to the theme</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="section quote-sec">
+  <div class="wrap reveal">
+    <div class="mark">“</div>
+    <blockquote data-es="Casita Dolce convirtió nuestra celebración en algo mágico. El carrito quedó perfecto con nuestros colores, los postres fueron un éxito y nuestros invitados no han dejado de hablar de ello.">Casita Dolce turned our celebration into something magical. The cart was styled perfectly to our colors, the treats were a hit, and our guests haven't stopped talking about it.</blockquote>
+    <p class="cite"><b>Mariana G.</b> &nbsp;·&nbsp; Quinceañera, Marietta, GA</p>
+  </div>
+</section>
+
+<!-- REQUEST -->
+<section class="section request" id="request">
+  <div class="wrap req-grid">
+    <div class="reveal">
+      <span class="eyebrow" data-es="Reserva tu fecha">Book your date</span>
+      <h2 data-es="Hagámoslo <em>inolvidable.</em>">Let's make it <em>unforgettable.</em></h2>
+      <p class="lead" data-es="Cuéntanos un poco sobre tu celebración y te responderemos con disponibilidad y una cotización personalizada.">Tell us a little about your celebration and we'll get back to you with availability and a custom quote.</p>
+      <div class="req-contact">
+        <div><span class="k">Instagram</span><a href="https://instagram.com/casita_dolces" style="color:var(--gold)">@casita_dolces</a></div>
+        <div><span class="k" data-es="Correo">Email</span>[ email address ]</div>
+        <div><span class="k" data-es="Teléfono">Phone</span>[ phone number ]</div>
+        <div><span class="k" data-es="Zona">Area</span>Metro Atlanta, GA</div>
+      </div>
+    </div>
+    <form class="quote-form reveal" id="quoteForm" novalidate>
+      <div class="field"><label data-es="Nombre completo">Full name</label><input type="text" name="name" placeholder="Your name" data-es-ph="Tu nombre" required></div>
+      <div class="field"><label data-es="Teléfono / correo">Phone / email</label><input type="text" name="contact" placeholder="Best way to reach you" data-es-ph="Mejor forma de contactarte" required></div>
+      <div class="field"><label data-es="Tipo de evento">Event type</label>
+        <select name="event"><option value="" data-es="Selecciona…">Select…</option><option data-es="Boda">Wedding</option><option data-es="Quinceañera">Quinceañera</option><option data-es="Evento Corporativo">Corporate Event</option><option data-es="Cumpleaños">Birthday</option><option data-es="Baby Shower">Baby Shower</option><option data-es="Otro">Other</option></select>
+      </div>
+      <div class="field"><label data-es="Fecha del evento">Event date</label><input type="date" name="date"></div>
+      <div class="field"><label data-es="Número de invitados">Guest count</label><input type="number" name="guests" placeholder="Approx." data-es-ph="Aprox."></div>
+      <div class="field"><label data-es="Ubicación">Location</label><input type="text" name="location" placeholder="City / venue" data-es-ph="Ciudad / lugar"></div>
+      <div class="field full"><label data-es="Cuéntanos">Tell us about it</label><textarea name="notes" placeholder="Theme, colors, carts you love…" data-es-ph="Tema, colores, carritos que te encantan…"></textarea></div>
+      <button type="submit" class="btn btn-solid full" data-es="Enviar Solicitud <span class=&quot;arw&quot;>→</span>">Send Request <span class="arw">→</span></button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <svg class="foot-logo" viewBox="0 0 56 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="28" cy="5" r="1.6" fill="#D9B872"/>
+          <path d="M28 6 V26" stroke="#D9B872" stroke-width="2" stroke-linecap="round"/>
+          <path d="M9 19 C9 9 19 7 28 7 C37 7 47 9 47 19" stroke="#D9B872" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M9 19 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0" stroke="#C08A4E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="14" y="26" width="28" height="13" rx="3" stroke="#D9B872" stroke-width="2.2"/>
+          <path d="M16 31 H40" stroke="#C08A4E" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M21 39 V41 M35 39 V41" stroke="#D9B872" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="21" cy="44" r="3" stroke="#D9B872" stroke-width="1.9"/>
+          <circle cx="35" cy="44" r="3" stroke="#D9B872" stroke-width="1.9"/>
+        </svg>
+        <div class="name">Casita Dolce</div>
+        <div class="tag" data-es="Carritos de Snacks de Lujo · Atlanta">Atlanta Luxury Snack Carts</div>
+        <p data-es="Carritos de snacks bellamente decorados que hacen tu evento inolvidable.">Beautifully styled snack carts that make your event unforgettable.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4 data-es="Explorar">Explore</h4>
+          <a href="#occasions" data-es="Ocasiones">Occasions</a>
+          <a href="#carte" data-es="Los Carritos">The Carts</a>
+          <a href="#process" data-es="Cómo Funciona">How It Works</a>
+          <a href="#gallery" data-es="Galería">Gallery</a>
+        </div>
+        <div class="foot-col">
+          <h4 data-es="Contacto">Get in touch</h4>
+          <a href="https://instagram.com/casita_dolces">@casita_dolces</a>
+          <p>[ email address ]</p>
+          <p>[ phone number ]</p>
+          <p>Metro Atlanta, GA</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span id="copyright"></span>
+      <span data-es="Haz tu evento inolvidable.">Make your event unforgettable.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // language toggle (EN / ES)
+  (function(){
+    const nodes = document.querySelectorAll('[data-es]');
+    const phNodes = document.querySelectorAll('[data-es-ph]');
+    nodes.forEach(n => n.setAttribute('data-en', n.innerHTML));
+    phNodes.forEach(n => n.setAttribute('data-en-ph', n.getAttribute('placeholder') || ''));
+    const yr = new Date().getFullYear();
+    const copyEl = document.getElementById('copyright');
+    const copy = {
+      en: '© ' + yr + ' Casita Dolce. All rights reserved.',
+      es: '© ' + yr + ' Casita Dolce. Todos los derechos reservados.'
+    };
+    const btns = document.querySelectorAll('.lang-toggle button');
+    function apply(lang){
+      nodes.forEach(n => { n.innerHTML = n.getAttribute(lang === 'es' ? 'data-es' : 'data-en'); });
+      phNodes.forEach(n => { n.setAttribute('placeholder', n.getAttribute(lang === 'es' ? 'data-es-ph' : 'data-en-ph')); });
+      if (copyEl) copyEl.textContent = copy[lang];
+      document.documentElement.lang = lang;
+      btns.forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+      try { localStorage.setItem('cd-lang', lang); } catch(e){}
+      window.CD_LANG = lang;
+    }
+    btns.forEach(b => b.addEventListener('click', () => apply(b.dataset.lang)));
+    let saved = 'en';
+    try { saved = localStorage.getItem('cd-lang') || 'en'; } catch(e){}
+    apply(saved);
+  })();
+
+  // mobile nav
+  const burger = document.getElementById('burger');
+  const links = document.getElementById('navLinks');
+  burger.addEventListener('click', () => links.classList.toggle('open'));
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+
+  // scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.14 });
+  document.querySelectorAll('.reveal').forEach((el,i) => {
+    el.style.transitionDelay = (i % 4 * 60) + 'ms';
+    io.observe(el);
+  });
+
+  // custom cart cursor (fine pointers only, respects reduced motion via CSS)
+  if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
+    const cursor = document.getElementById('cartCursor');
+    document.documentElement.classList.add('cart-cursor');
+    let idleT, overField = false;
+    window.addEventListener('mousemove', (e) => {
+      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+      if (overField) { cursor.style.opacity = '0'; return; }
+      cursor.style.opacity = '1';
+      cursor.classList.add('rolling');
+      clearTimeout(idleT);
+      idleT = setTimeout(() => cursor.classList.remove('rolling'), 150);
+    }, { passive: true });
+    document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; });
+    document.addEventListener('mousedown', () => cursor.classList.add('press'));
+    document.addEventListener('mouseup', () => cursor.classList.remove('press'));
+    // over form fields, hide the cart and show the native text caret
+    document.querySelectorAll('input, textarea, select').forEach((f) => {
+      f.addEventListener('mouseenter', () => { overField = true; cursor.style.opacity = '0'; cursor.classList.remove('rolling'); });
+      f.addEventListener('mouseleave', () => { overField = false; });
+    });
+  }
+
+  // form (placeholder handler — wire to real endpoint / email on launch)
+  document.getElementById('quoteForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const msg = window.CD_LANG === 'es'
+      ? '¡Gracias! Este formulario es una demostración — lo conectaremos al correo de Casita Dolce antes del lanzamiento.'
+      : 'Thank you! This form is a demo — we\'ll connect it to Casita Dolce\'s inbox before launch.';
+    alert(msg);
+  });
+</script>
+</body>
+</html>

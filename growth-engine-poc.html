@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous Growth Engine - POC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .content-week {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .content-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .content-item strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .decisions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .decisions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .decision {
+            background: white;
+            padding: 12px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .decision .title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .decision .desc {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            background: #10b981;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Autonomous Growth Engine</h1>
+            <p>AI-Powered Creator Automation POC</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2>📝 Creator Profile</h2>
+                <div class="success-message" id="successMsg">✓ Growth plan generated!</div>
+
+                <div class="form-group">
+                    <label>Creator Name</label>
+                    <input type="text" id="creatorName" placeholder="e.g., Sarah Chen" value="Maya">
+                </div>
+
+                <div class="form-group">
+                    <label>Niche</label>
+                    <input type="text" id="niche" placeholder="e.g., Lifestyle, Finance, Beauty" value="Lifestyle & Fashion">
+                </div>
+
+                <div class="form-group">
+                    <label>Audience Size</label>
+                    <select id="audience">
+                        <option value="emerging">Emerging (1k-10k)</option>
+                        <option value="growing" selected>Growing (10k-100k)</option>
+                        <option value="established">Established (100k+)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Primary Platforms</label>
+                    <input type="text" id="platforms" placeholder="e.g., TikTok, Instagram, YouTube" value="TikTok, Instagram">
+                </div>
+
+                <div class="form-group">
+                    <label>Brand Voice</label>
+                    <textarea id="voice" placeholder="Describe your brand tone...">Mysterious, elegant, aspirational luxury aesthetic</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Goals</label>
+                    <textarea id="goals" placeholder="What do you want to achieve?">Build engaged community, drive traffic to Patreon, establish as lifestyle influencer</textarea>
+                </div>
+
+                <button onclick="generatePlan()">Generate Growth Plan →</button>
+            </div>
+
+            <!-- Output Section -->
+            <div class="card">
+                <h2>📅 Weekly Content Plan</h2>
+                <div id="output" style="display: none;">
+                    <div class="content-week" id="contentWeek"></div>
+                </div>
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>🤖 AI is generating your growth strategy...</p>
+                </div>
+                <div id="initial" style="text-align: center; color: #999; padding: 40px;">
+                    Fill in your profile and click "Generate Growth Plan" to see AI-powered content strategy
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics & Decisions -->
+        <div class="bottom-grid">
+            <div class="card">
+                <h2>📊 Projected Analytics</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="number" id="viewsGrowth">+45%</div>
+                        <div class="label">View Growth</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="engagementLift">+32%</div>
+                        <div class="label">Engagement Lift</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="followerGain">+2.3k</div>
+                        <div class="label">Follower Gain</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="conversionLift">+18%</div>
+                        <div class="label">Conversion Lift</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🤖 AI Recommendations</h2>
+                <div class="decisions" id="decisions">
+                    <div class="decision">
+                        <div class="title">Optimize Post Times</div>
+                        <div class="desc">Post 6-9pm weekdays for 45% higher engagement based on your audience data</div>
+                    </div>
+                    <div class="decision">
+                        <div class="title">Double Down on Reels</div>
+                        <div class="desc">Short-form video content outperforming by 3x - increase from 40% to 70% of content</div>
+                    </div>
+                    <div class="decision">
+                        <div class="title">Launch Email Funnel</div>
+                        <div class="desc">Weekly newsletter to monetize audience - projected $2k-5k/month additional revenue</div>
+                    </div>
+                    <div class="decision">
+                        <div class="title">Collaborate with 5 Creators</div>
+                        <div class="desc">Reach 250k new audience - similar style, 50k-500k followers in your niche</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generatePlan() {
+            const creatorName = document.getElementById('creatorName').value;
+            const niche = document.getElementById('niche').value;
+            const platforms = document.getElementById('platforms').value;
+            const voice = document.getElementById('voice').value;
+            const goals = document.getElementById('goals').value;
+            const audience = document.getElementById('audience').value;
+
+            if (!creatorName || !niche) {
+                alert('Please fill in Creator Name and Niche');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('initial').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('output').style.display = 'none';
+
+            // Simulate AI generation (in real version, call Claude API)
+            setTimeout(() => {
+                const contentIdeas = generateContentIdeas(creatorName, niche, voice, goals);
+                displayContentPlan(contentIdeas);
+                updateAnalytics(audience);
+                showSuccess();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('output').style.display = 'block';
+            }, 2000);
+        }
+
+        function generateContentIdeas(name, niche, voice, goals) {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const ideas = [
+                { type: '📸 Aesthetic Reel', desc: 'Morning routine showcase with mystery aesthetic' },
+                { type: '💬 Carousel Post', desc: '7 style tips for minimalist luxury look' },
+                { type: '🎥 Tutorial Video', desc: 'How to style limited wardrobe for maximum outfits' },
+                { type: '✨ Behind-the-Scenes', desc: 'Day in life of building luxury personal brand' },
+                { type: '💡 Thought Leadership', desc: 'Why aesthetic consistency builds loyal audience' },
+                { type: '🎬 Short Film', desc: 'Cinematic piece on exclusivity and mystery' },
+                { type: '📱 Trending Audio', desc: 'Quick transition video with trending sound' }
+            ];
+
+            return days.map((day, i) => ({
+                day,
+                content: ideas[i % ideas.length],
+                platform: i % 2 === 0 ? 'TikTok' : 'Instagram'
+            }));
+        }
+
+        function displayContentPlan(plan) {
+            const container = document.getElementById('contentWeek');
+            container.innerHTML = plan.map(item => `
+                <div class="content-item">
+                    <strong>${item.day}</strong>
+                    ${item.content.type}<br>
+                    <em style="opacity: 0.8; font-size: 0.85em;">${item.content.desc}</em><br>
+                    <span style="opacity: 0.7; font-size: 0.8em;">→ ${item.platform}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateAnalytics(audience) {
+            const metrics = {
+                'emerging': { views: '+65%', engagement: '+52%', followers: '+5.2k', conversion: '+28%' },
+                'growing': { views: '+45%', engagement: '+32%', followers: '+2.3k', conversion: '+18%' },
+                'established': { views: '+28%', engagement: '+22%', followers: '+1.1k', conversion: '+12%' }
+            };
+
+            const data = metrics[audience];
+            document.getElementById('viewsGrowth').textContent = data.views;
+            document.getElementById('engagementLift').textContent = data.engagement;
+            document.getElementById('followerGain').textContent = data.followers;
+            document.getElementById('conversionLift').textContent = data.conversion;
+        }
+
+        function showSuccess() {
+            const msg = document.getElementById('successMsg');
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

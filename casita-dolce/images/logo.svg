@@ -1,0 +1,19 @@
+<svg viewBox="0 0 56 50" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Casita Dolce">
+  <!-- finial -->
+  <circle cx="28" cy="5" r="1.6" fill="#C08A4E"/>
+  <!-- central pole -->
+  <path d="M28 6 V26" stroke="#C08A4E" stroke-width="2" stroke-linecap="round"/>
+  <!-- awning canopy -->
+  <path d="M9 19 C9 9 19 7 28 7 C37 7 47 9 47 19" stroke="#C08A4E" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- scalloped fringe -->
+  <path d="M9 19 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0 q2.4 4.4 4.8 0" stroke="#D9B872" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- cart body -->
+  <rect x="14" y="26" width="28" height="13" rx="3" stroke="#C08A4E" stroke-width="2.2"/>
+  <!-- counter line -->
+  <path d="M16 31 H40" stroke="#D9B872" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- legs -->
+  <path d="M21 39 V41 M35 39 V41" stroke="#C08A4E" stroke-width="2" stroke-linecap="round"/>
+  <!-- wheels -->
+  <circle cx="21" cy="44" r="3" stroke="#C08A4E" stroke-width="1.9"/>
+  <circle cx="35" cy="44" r="3" stroke="#C08A4E" stroke-width="1.9"/>
+</svg>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DECISIONS - Pricing Optimizer POC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 24px;
+            font-size: 1.6em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .recommendation-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .recommendation-box h3 {
+            font-size: 1.3em;
+            margin-bottom: 16px;
+        }
+
+        .recommendation-box .price {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 16px 0;
+        }
+
+        .recommendation-box .reasoning {
+            font-size: 0.95em;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .comparison-box {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .comparison-box h4 {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .comparison-box .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .integrations {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .integrations h4 {
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .integration-item {
+            font-size: 0.9em;
+            margin: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .integration-item:before {
+            content: "→";
+            position: absolute;
+            left: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .revenue-impact {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .revenue-impact strong {
+            color: #2e7d32;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 DECISIONS</h1>
+            <p>AI-Powered Pricing Optimization for E-Commerce</p>
+        </header>
+
+        <div class="grid">
+            <!-- Input -->
+            <div class="card">
+                <h2>📊 Your Store Data</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="productName" placeholder="e.g., Premium Leather Bag" value="Wireless Headphones">
+                    </div>
+                    <div class="form-group">
+                        <label>Monthly Sales Volume</label>
+                        <input type="number" id="monthlyVolume" placeholder="Units sold per month" value="500">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Product Cost</label>
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-size: 1.2em; color: #667eea; font-weight: 600; margin-right: 8px;">$</span>
+                            <input type="number" id="cost" placeholder="Manufacturing cost" value="45" style="flex: 1;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Current Price</label>
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-size: 1.2em; color: #667eea; font-weight: 600; margin-right: 8px;">$</span>
+                            <input type="number" id="currentPrice" placeholder="Current selling price" value="129" style="flex: 1;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Competitor Price</label>
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-size: 1.2em; color: #667eea; font-weight: 600; margin-right: 8px;">$</span>
+                            <input type="number" id="competitorPrice" placeholder="Avg competitor price" value="149" style="flex: 1;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Demand Trend</label>
+                        <select id="demand">
+                            <option value="high">↑ High (growing)</option>
+                            <option value="stable" selected>→ Stable</option>
+                            <option value="low">↓ Low (declining)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label>Customer Feedback (optional)</label>
+                    <input type="text" id="feedback" placeholder="e.g., 'Price complaints in reviews', 'Customers love quality'" value="Customers say price is fair">
+                </div>
+
+                <button onclick="getPriceRecommendation()">Get AI Recommendation →</button>
+            </div>
+
+            <!-- Output -->
+            <div class="card">
+                <h2>🤖 AI Recommendation</h2>
+
+                <div id="initial" style="text-align: center; color: #999; padding: 60px 20px;">
+                    Fill in your data and click "Get AI Recommendation" to see Claude's pricing strategy
+                </div>
+
+                <div id="result" class="result">
+                    <div class="recommendation-box">
+                        <h3>Recommended Price</h3>
+                        <div class="price" id="recommendedPrice">$139</div>
+                        <div class="reasoning" id="reasoning">
+                            Analyzing market conditions...
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-label">Projected Margin</div>
+                            <div class="metric-value" id="margin">42%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Monthly Revenue</div>
+                            <div class="metric-value" id="revenue">$69,500</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Price Change</div>
+                            <div class="metric-value" id="change">+7.8%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Est. Volume Impact</div>
+                            <div class="metric-value" id="volumeChange">-2%</div>
+                        </div>
+                    </div>
+
+                    <div class="revenue-impact">
+                        <strong id="impactText">💰 Projected Annual Impact: +$42,000</strong>
+                        <p style="font-size: 0.9em; margin-top: 8px; color: #2e7d32;">Based on 12-month projection with competitive positioning and demand curve modeling</p>
+                    </div>
+
+                    <div class="integrations">
+                        <h4>How This Gets Executed:</h4>
+                        <div class="integration-item">Plausible tracks current price effectiveness in real-time</div>
+                        <div class="integration-item">Twenty CRM segments customers by price sensitivity</div>
+                        <div class="integration-item">n8n automatically updates price across Shopify/WooCommerce</div>
+                        <div class="integration-item">Daily monitoring dashboard shows revenue impact</div>
+                        <div class="integration-item">Claude re-optimizes weekly as data changes</div>
+                    </div>
+                </div>
+
+                <div id="loading" style="display: none;" class="loading">
+                    <div class="spinner"></div>
+                    <p>Claude is analyzing your market position...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom insights -->
+        <div class="card">
+            <h2>💡 How DECISIONS Works (The Loop)</h2>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 2em; margin-bottom: 8px;">📊</div>
+                    <div style="font-weight: 600; color: #333; margin-bottom: 4px;">Data In</div>
+                    <div style="font-size: 0.9em; color: #666;">Real sales, costs, competitor prices</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 2em; margin-bottom: 8px;">🧠</div>
+                    <div style="font-weight: 600; color: #333; margin-bottom: 4px;">Claude Reasons</div>
+                    <div style="font-size: 0.9em; color: #666;">Market position, elasticity, profit optimization</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 2em; margin-bottom: 8px;">⚡</div>
+                    <div style="font-weight: 600; color: #333; margin-bottom: 4px;">n8n Executes</div>
+                    <div style="font-size: 0.9em; color: #666;">Automatically updates price across all channels</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 2em; margin-bottom: 8px;">📈</div>
+                    <div style="font-weight: 600; color: #333; margin-bottom: 4px;">Plausible Tracks</div>
+                    <div style="font-size: 0.9em; color: #666;">Measures revenue impact, feeds back to Claude</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getPriceRecommendation() {
+            const productName = document.getElementById('productName').value;
+            const monthlyVolume = parseInt(document.getElementById('monthlyVolume').value);
+            const cost = parseInt(document.getElementById('cost').value);
+            const currentPrice = parseInt(document.getElementById('currentPrice').value);
+            const competitorPrice = parseInt(document.getElementById('competitorPrice').value);
+            const demand = document.getElementById('demand').value;
+            const feedback = document.getElementById('feedback').value;
+
+            // Show loading
+            document.getElementById('initial').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').classList.remove('show');
+
+            // Simulate Claude reasoning (2 second delay)
+            setTimeout(() => {
+                // Simple pricing algorithm
+                let recommendedPrice = currentPrice;
+                let reasoning = "";
+
+                if (demand === 'high') {
+                    recommendedPrice = Math.ceil(competitorPrice * 0.98);
+                    reasoning = `High demand detected. Price competitively just below market ($${competitorPrice}) to capture market share while maintaining margins.`;
+                } else if (demand === 'stable') {
+                    recommendedPrice = Math.ceil((currentPrice + competitorPrice) / 2 * 1.05);
+                    reasoning = `Stable market. Recommend slight increase to current average. Your product appears valued; small increase won't hurt volume.`;
+                } else {
+                    recommendedPrice = Math.ceil(currentPrice * 0.92);
+                    reasoning = `Declining demand. Competitive pricing is key. Lower to $${recommendedPrice} to defend market share.`;
+                }
+
+                const margin = Math.round(((recommendedPrice - cost) / recommendedPrice) * 100);
+                const priceChange = Math.round(((recommendedPrice - currentPrice) / currentPrice) * 100 * 10) / 10;
+                const volumeChange = -Math.abs(priceChange) * 0.3; // Price elasticity
+                const currentMonthlyRevenue = monthlyVolume * currentPrice;
+                const newVolume = Math.round(monthlyVolume * (1 + volumeChange / 100));
+                const newMonthlyRevenue = newVolume * recommendedPrice;
+                const annualImpact = (newMonthlyRevenue - currentMonthlyRevenue) * 12;
+
+                // Update display
+                document.getElementById('recommendedPrice').textContent = `$${recommendedPrice}`;
+                document.getElementById('reasoning').textContent = reasoning;
+                document.getElementById('margin').textContent = `${margin}%`;
+                document.getElementById('revenue').textContent = `$${newMonthlyRevenue.toLocaleString()}`;
+                document.getElementById('change').textContent = `${priceChange > 0 ? '+' : ''}${priceChange}%`;
+                document.getElementById('volumeChange').textContent = `${volumeChange.toFixed(1)}%`;
+                document.getElementById('impactText').textContent = `💰 Projected Annual Impact: ${annualImpact > 0 ? '+' : ''}$${Math.abs(annualImpact).toLocaleString()}`;
+
+                // Hide loading, show result
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('result').classList.add('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
