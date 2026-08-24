@@ -266,7 +266,9 @@
       "Bash(ffmpeg -i hf_20260819_013107_01dc2978-5659-4a4b-9af7-804a72d0c2b6.png -update 1 -frames:v 1 image2.jpg)",
       "Bash(pnpm agent:setup)",
       "Bash(elixir --version)",
-      "Bash(erlang --version)"
+      "Bash(erlang --version)",
+      "Bash(/opt/homebrew/bin/python3.12 -m pip install --upgrade pip setuptools wheel)",
+      "Bash(/opt/homebrew/bin/python3.12 -m venv /Users/Owner/Desktop/Vibe-Trading/venv)"
     ]
   }
 }
