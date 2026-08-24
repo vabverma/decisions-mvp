@@ -27,7 +27,7 @@ interface AuthRequest extends Request {
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
-  if (!secret) {
+  if (typeof secret !== 'string') {
     throw new Error('JWT_SECRET not configured');
   }
   return secret;
