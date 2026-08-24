@@ -55,21 +55,30 @@ router.post('/track', verifyToken, async (req: Request, res: Response) => {
   const { recommendationId, actualPrice, actualVolume, actualRevenue } = req.body;
 
   try {
+    if (!recommendationId || !userId) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     await pool.query(
       `INSERT INTO revenue_tracking (user_id, recommendation_id, actual_price, actual_volume, actual_revenue)
        VALUES ($1, $2, $3, $4, $5)`,
       [userId, recommendationId, actualPrice, actualVolume, actualRevenue]
     );
 
-    // Update recommendation status
-    await pool.query(
-      `UPDATE recommendations SET status = 'tracking' WHERE id = $1`,
-      [recommendationId]
+    // Update recommendation status - only if it belongs to the user
+    const result = await pool.query(
+      `UPDATE recommendations SET status = 'tracking'
+       WHERE id = $1 AND user_id = $2
+       RETURNING id`,
+      [recommendationId, userId]
     );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Recommendation not found' });
+    }
 
     res.json({ status: 'tracked' });
   } catch (error) {
-    console.error('Revenue tracking error:', error);
     res.status(500).json({ error: 'Failed to track revenue' });
   }
 });

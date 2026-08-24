@@ -18,11 +18,13 @@
     "cors": "*",
     "dotenv": "*",
     "express": "*",
+    "express-rate-limit": "*",
     "jsonwebtoken": "*",
     "pg": "*",
     "stripe": "*",
     "typescript": "*",
-    "uuid": "*"
+    "uuid": "*",
+    "zod": "*"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

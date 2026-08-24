@@ -5,21 +5,20 @@ import { getStripe } from '../services/stripe.service';
 
 const router = express.Router();
 
-const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test_secret';
+const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+
+if (!WEBHOOK_SECRET || WEBHOOK_SECRET === 'whsec_test_secret') {
+  console.error('🔴 CRITICAL: STRIPE_WEBHOOK_SECRET must be configured and not be the test default');
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  }
+}
 
 router.post('/stripe', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'] as string;
 
-  if (!sig || !WEBHOOK_SECRET || WEBHOOK_SECRET === 'whsec_test_secret') {
-    console.warn('Webhook signature or secret not configured. Skipping verification for local development.');
-    try {
-      const event = JSON.parse(req.body.toString());
-      await processStripeEvent(event);
-      return res.json({ received: true });
-    } catch (error) {
-      console.error('Local webhook processing error:', error);
-      return res.status(400).json({ error: 'Invalid JSON' });
-    }
+  if (!sig || !WEBHOOK_SECRET) {
+    return res.status(400).json({ error: 'Webhook not properly configured' });
   }
 
   let event;

@@ -1,15 +1,36 @@
 import express, { Request, Response } from 'express';
+import { z } from 'zod';
 import { getPricingRecommendation } from '../services/claude.service';
 import { pool } from '../db/init';
 import { verifyToken } from '../middleware/auth';
 
 const router = express.Router();
 
+const pricingInputSchema = z.object({
+  productName: z.string().min(1).max(255),
+  currentPrice: z.number().positive(),
+  cost: z.number().nonnegative(),
+  competitorPrice: z.number().positive(),
+  monthlyVolume: z.number().positive().int(),
+  demandTrend: z.enum(['high', 'stable', 'low']),
+  customerFeedback: z.string().max(1000).optional(),
+});
+
 router.post('/pricing', verifyToken, async (req: Request, res: Response) => {
-  console.log('📍 Pricing recommendation route called');
   const userId = (req as any).user?.id;
-  const { productName, currentPrice, cost, competitorPrice, monthlyVolume, demandTrend, customerFeedback } = req.body;
-  console.log('User ID:', userId, 'Product:', productName);
+
+  if (!userId) {
+    return res.status(401).json({ error: 'User not authenticated' });
+  }
+
+  let validated;
+  try {
+    validated = pricingInputSchema.parse(req.body);
+  } catch (error) {
+    return res.status(400).json({ error: 'Invalid input parameters' });
+  }
+
+  const { productName, currentPrice, cost, competitorPrice, monthlyVolume, demandTrend, customerFeedback } = validated;
 
   try {
     // Check freemium limit
@@ -72,24 +93,15 @@ router.post('/pricing', verifyToken, async (req: Request, res: Response) => {
       ...recommendation,
     });
   } catch (error: any) {
-    console.error('❌ Pricing recommendation error:', {
-      message: error?.message || String(error),
+    // Log detailed error internally only
+    console.error('Pricing recommendation error:', {
+      message: error?.message,
       code: error?.code,
-      status: error?.status,
-      stack: error?.stack,
-      fullError: error,
+      userId,
     });
 
-    // Provide more specific error messages for debugging
-    if (error?.message?.includes('ANTHROPIC_API_KEY')) {
-      console.error('🔴 Claude API key not configured');
-      res.status(500).json({ error: 'API configuration error: Claude API key missing' });
-    } else if (error?.message?.includes('DATABASE_URL')) {
-      console.error('🔴 Database not configured');
-      res.status(500).json({ error: 'API configuration error: Database connection missing' });
-    } else {
-      res.status(500).json({ error: 'Failed to generate recommendation', details: error?.message });
-    }
+    // Return generic error to client
+    res.status(500).json({ error: 'Failed to generate pricing recommendation' });
   }
 });
 

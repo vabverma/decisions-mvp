@@ -5,12 +5,25 @@ import axios from 'axios';
 
 const router = express.Router();
 
+const isValidUrl = (urlString: string): boolean => {
+  try {
+    const url = new URL(urlString);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 // Connect to n8n webhook
 router.post('/n8n/connect', verifyToken, async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   const { webhookUrl } = req.body;
 
   try {
+    if (!isValidUrl(webhookUrl)) {
+      return res.status(400).json({ error: 'Invalid webhook URL' });
+    }
+
     // Test webhook connection
     await axios.post(webhookUrl, {
       test: true,
@@ -26,7 +39,6 @@ router.post('/n8n/connect', verifyToken, async (req: Request, res: Response) => 
 
     res.json({ status: 'connected' });
   } catch (error) {
-    console.error('n8n connection error:', error);
     res.status(400).json({ error: 'Failed to connect to n8n' });
   }
 });
@@ -37,6 +49,15 @@ router.post('/shopify/connect', verifyToken, async (req: Request, res: Response)
   const { accessToken, storeUrl } = req.body;
 
   try {
+    // Validate storeUrl to prevent SSRF
+    if (!storeUrl || typeof storeUrl !== 'string') {
+      return res.status(400).json({ error: 'Invalid store URL' });
+    }
+
+    if (!storeUrl.endsWith('.myshopify.com')) {
+      return res.status(400).json({ error: 'Invalid Shopify store URL' });
+    }
+
     // Verify Shopify connection
     const response = await axios.get(`https://${storeUrl}/admin/api/2024-01/shop.json`, {
       headers: {
@@ -54,7 +75,6 @@ router.post('/shopify/connect', verifyToken, async (req: Request, res: Response)
       res.json({ status: 'connected', shop: response.data.shop.name });
     }
   } catch (error) {
-    console.error('Shopify connection error:', error);
     res.status(400).json({ error: 'Failed to connect to Shopify' });
   }
 });
@@ -65,6 +85,10 @@ router.post('/plausible/connect', verifyToken, async (req: Request, res: Respons
   const { siteId, apiKey } = req.body;
 
   try {
+    if (!siteId || typeof siteId !== 'string' || !apiKey || typeof apiKey !== 'string') {
+      return res.status(400).json({ error: 'Invalid siteId or apiKey' });
+    }
+
     // Verify Plausible connection
     const response = await axios.get(`https://plausible.io/api/v1/sites/${siteId}`, {
       headers: {
@@ -82,7 +106,6 @@ router.post('/plausible/connect', verifyToken, async (req: Request, res: Respons
       res.json({ status: 'connected', domain: response.data.domain });
     }
   } catch (error) {
-    console.error('Plausible connection error:', error);
     res.status(400).json({ error: 'Failed to connect to Plausible' });
   }
 });

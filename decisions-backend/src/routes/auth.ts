@@ -1,17 +1,26 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import { pool } from '../db/init';
 import { getStripe } from '../services/stripe.service';
 import { sendWelcomeEmail } from '../services/email.service';
 
 const router = express.Router();
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many authentication attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 interface AuthRequest extends Request {
   user?: { id: string; email: string };
 }
 
-router.post('/register', async (req: AuthRequest, res: Response) => {
+router.post('/register', authLimiter, async (req: AuthRequest, res: Response) => {
   const { email, password, storeName } = req.body;
 
   try {
@@ -20,8 +29,16 @@ router.post('/register', async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
+    if (typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    if (typeof password !== 'string' || password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
+
+    // Hash password with stronger rounds
+    const passwordHash = await bcrypt.hash(password, 12);
 
     // Create Stripe customer
     const stripeCustomer = await getStripe().customers.create({
@@ -49,19 +66,22 @@ router.post('/register', async (req: AuthRequest, res: Response) => {
       console.error('Failed to send welcome email:', err)
     );
 
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'secret');
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET not configured');
+    }
+    const token = jwt.sign({ id: user.id, email: user.email }, secret);
 
     res.json({ user, token });
   } catch (error: any) {
-    console.error('Registration error:', error);
     if (error.code === '23505') {
       return res.status(400).json({ error: 'Email already registered' });
     }
-    res.status(400).json({ error: 'Registration failed' });
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
 
-router.post('/login', async (req: AuthRequest, res: Response) => {
+router.post('/login', authLimiter, async (req: AuthRequest, res: Response) => {
   const { email, password } = req.body;
 
   try {
@@ -77,11 +97,14 @@ router.post('/login', async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'secret');
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET not configured');
+    }
+    const token = jwt.sign({ id: user.id, email: user.email }, secret);
     res.json({ user: { id: user.id, email: user.email, subscription_tier: user.subscription_tier }, token });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(400).json({ error: 'Login failed' });
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
