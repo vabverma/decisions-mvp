@@ -269,7 +269,9 @@
       "Bash(erlang --version)",
       "Bash(/opt/homebrew/bin/python3.12 -m pip install --upgrade pip setuptools wheel)",
       "Bash(/opt/homebrew/bin/python3.12 -m venv /Users/Owner/Desktop/Vibe-Trading/venv)",
-      "Bash(cat ~/.claude/settings.json 2>/dev/null | head -50)"
+      "Bash(cat ~/.claude/settings.json 2>/dev/null | head -50)",
+      "Bash(cat > *)",
+      "Bash(cp ~/.claude/mcp/robinhood/.env.template ~/.claude/mcp/robinhood/.env && echo \"✅ Created .env file at ~/.claude/mcp/robinhood/.env\" && echo && echo \"Template contents:\" && cat ~/.claude/mcp/robinhood/.env)"
     ]
   }
 }

@@ -1,0 +1,30 @@
+# Production Environment Variables for Render
+# Copy these to Render dashboard -> Environment
+
+NODE_ENV=production
+PORT=3000
+
+# Database (provided by Render PostgreSQL)
+DATABASE_URL=[Will be auto-filled by Render]
+
+# Authentication
+JWT_SECRET=USE_THE_GENERATED_SECRET_ABOVE
+
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_51U7g1P5Dli3bzgh25Yp3kpBaDnCAkZcMMKMPeJp8gO6R0Y8AJMNHEX9LxwzgWjl9t7ssRy41OHs0zBI6YKlMp1ig00BnGR2dF2
+STRIPE_PUBLISHABLE_KEY=pk_test_51U7g1P5Dli3bzgh2FWIRGIehQfxAbmnuJ58cDmMHMrFcY9cM9WltDF4KQcXybWjEz8C8KoSmzRUyP0IXpmY3AlOw00fLEJoOzi
+STRIPE_WEBHOOK_SECRET=whsec_test_local
+STRIPE_STARTER_PRICE_ID=price_1U7o4h5Dli3bzgh2V5XumvgX
+STRIPE_PRO_PRICE_ID=price_1U7o4i5Dli3bzgh2FfKW3Oh1
+
+# APIs
+ANTHROPIC_API_KEY=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
+SENDGRID_API_KEY=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
+SENTRY_DSN=https://b4cdab1a3cf064303baf625e0f426402@o4511961647546368.ingest.us.sentry.io/4511961667403776
+
+# App URLs (set by Render)
+APP_URL=[Render backend URL]
+DASHBOARD_URL=[Render frontend URL]
+
+# Feature flags
+USE_CLAUDE_API=false
