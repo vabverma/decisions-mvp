@@ -20,10 +20,23 @@ router.post('/create-checkout', verifyToken, async (req: Request, res: Response)
     const userResult = await pool.query('SELECT stripe_customer_id, email FROM users WHERE id = $1', [userId]);
     const user = userResult.rows[0];
 
+    let stripeCustomerId = user.stripe_customer_id;
+
+    // Create Stripe customer if missing (edge case)
+    if (!stripeCustomerId) {
+      const stripeCustomer = await getStripe().customers.create({
+        email: user.email,
+      });
+      stripeCustomerId = stripeCustomer.id;
+
+      // Update user record
+      await pool.query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [stripeCustomerId, userId]);
+    }
+
     const priceId = planType === 'pro' ? PRO_PRICE_ID : STARTER_PRICE_ID;
 
     const session = await getStripe().checkout.sessions.create({
-      customer: user.stripe_customer_id,
+      customer: stripeCustomerId,
       payment_method_types: ['card'],
       line_items: [
         {
