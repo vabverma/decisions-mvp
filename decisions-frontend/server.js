@@ -15,17 +15,15 @@ const BACKEND_URL = process.env.VITE_API_URL || 'https://decisions-backend.onren
 console.log(`[Server] Backend URL: ${BACKEND_URL}`);
 console.log(`[Server] distPath: ${distPath}`);
 
-app.use(express.json());
-
-// API proxy - forward /api requests to backend
+// API proxy - forward /api requests to backend (must run before express.json()
+// so the raw request stream is still available to pipe through)
 app.use('/api', (req, res) => {
-  const backendUrl = `${BACKEND_URL}${req.path}`;
-  console.log(`[Proxy] ${req.method} ${req.path} -> ${backendUrl}`);
+  const backendUrl = `${BACKEND_URL}${req.originalUrl}`;
+  console.log(`[Proxy] ${req.method} ${req.originalUrl} -> ${backendUrl}`);
 
   const options = {
     method: req.method,
     headers: {
-      'Content-Type': 'application/json',
       ...req.headers,
     },
   };
@@ -43,12 +41,10 @@ app.use('/api', (req, res) => {
     res.status(502).json({ error: 'Backend unavailable' });
   });
 
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
-    req.pipe(proxyReq);
-  } else {
-    proxyReq.end();
-  }
+  req.pipe(proxyReq);
 });
+
+app.use(express.json());
 
 app.use(express.static(distPath));
 
