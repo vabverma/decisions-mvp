@@ -25,14 +25,6 @@ interface AuthRequest extends Request {
   };
 }
 
-function getJwtSecret(): string {
-  const secret: string | undefined = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error('JWT_SECRET not configured');
-  }
-  return secret as any as string;
-}
-
 router.post('/register', authLimiter, async (req: AuthRequest, res: Response) => {
   const { email, password, storeName } = req.body;
 
@@ -79,8 +71,11 @@ router.post('/register', authLimiter, async (req: AuthRequest, res: Response) =>
       console.error('Failed to send welcome email:', err)
     );
 
-    // @ts-ignore - getJwtSecret() always returns string
-    const token = jwt.sign({ id: user.id, email: user.email }, getJwtSecret());
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+    const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret);
 
     res.json({ user, token });
   } catch (error: any) {
@@ -107,8 +102,11 @@ router.post('/login', authLimiter, async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // @ts-ignore - getJwtSecret() always returns string
-    const token = jwt.sign({ id: user.id, email: user.email }, getJwtSecret());
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+    const token = jwt.sign({ id: user.id, email: user.email }, jwtSecret);
     res.json({ user: { id: user.id, email: user.email, subscription_tier: user.subscription_tier }, token });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
