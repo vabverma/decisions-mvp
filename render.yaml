@@ -62,4 +62,7 @@ services:
     startCommand: cd decisions-frontend && npm run preview
     envVars:
       - key: VITE_API_URL
-        value: /api
+        fromService:
+          type: web
+          name: decisions-backend
+          property: url
