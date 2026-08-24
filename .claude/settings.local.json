@@ -271,7 +271,17 @@
       "Bash(/opt/homebrew/bin/python3.12 -m venv /Users/Owner/Desktop/Vibe-Trading/venv)",
       "Bash(cat ~/.claude/settings.json 2>/dev/null | head -50)",
       "Bash(cat > *)",
-      "Bash(cp ~/.claude/mcp/robinhood/.env.template ~/.claude/mcp/robinhood/.env && echo \"✅ Created .env file at ~/.claude/mcp/robinhood/.env\" && echo && echo \"Template contents:\" && cat ~/.claude/mcp/robinhood/.env)"
+      "Bash(cp ~/.claude/mcp/robinhood/.env.template ~/.claude/mcp/robinhood/.env && echo \"✅ Created .env file at ~/.claude/mcp/robinhood/.env\" && echo && echo \"Template contents:\" && cat ~/.claude/mcp/robinhood/.env)",
+      "Bash(gh repo *)",
+      "Bash(GIT_TRACE=1 git push -u origin main)",
+      "Bash(gh auth *)",
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__list_services",
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__list_workspaces",
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__select_workspace",
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__list_deploys",
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__list_logs",
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__trigger_deploy",
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__get_service"
     ]
   }
 }

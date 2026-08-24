@@ -18,6 +18,11 @@ const authLimiter = rateLimit({
 
 interface AuthRequest extends Request {
   user?: { id: string; email: string };
+  body: {
+    email?: string;
+    password?: string;
+    storeName?: string;
+  };
 }
 
 router.post('/register', authLimiter, async (req: AuthRequest, res: Response) => {
