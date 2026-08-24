@@ -5,14 +5,14 @@ import { verifyToken } from '../middleware/auth';
 
 const router = express.Router();
 
-const PRICING_OPTIMIZER_PRICE_ID = process.env.STRIPE_PRICING_OPTIMIZER_PRICE_ID || 'price_test_pricing';
-const PREMIUM_PRICE_ID = process.env.STRIPE_PREMIUM_PRICE_ID || 'price_test_premium';
+const STARTER_PRICE_ID = process.env.STRIPE_STARTER_PRICE_ID || 'price_test_starter';
+const PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID || 'price_test_pro';
 
 router.post('/create-checkout', verifyToken, async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   const { planType } = req.body;
 
-  if (!planType || !['pricing_optimizer', 'premium'].includes(planType)) {
+  if (!planType || !['starter', 'pro'].includes(planType)) {
     return res.status(400).json({ error: 'Invalid plan type' });
   }
 
@@ -20,7 +20,7 @@ router.post('/create-checkout', verifyToken, async (req: Request, res: Response)
     const userResult = await pool.query('SELECT stripe_customer_id, email FROM users WHERE id = $1', [userId]);
     const user = userResult.rows[0];
 
-    const priceId = planType === 'premium' ? PREMIUM_PRICE_ID : PRICING_OPTIMIZER_PRICE_ID;
+    const priceId = planType === 'pro' ? PRO_PRICE_ID : STARTER_PRICE_ID;
 
     const session = await getStripe().checkout.sessions.create({
       customer: user.stripe_customer_id,
