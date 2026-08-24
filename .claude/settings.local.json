@@ -281,7 +281,8 @@
       "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__list_deploys",
       "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__list_logs",
       "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__trigger_deploy",
-      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__get_service"
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__get_service",
+      "mcp__8a9c7552-0f62-45cd-bdd2-1c8368c0621e__get_deploy"
     ]
   }
 }
