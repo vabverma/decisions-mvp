@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
-import { extractReferralSummary } from "@/lib/extract";
+import { extractSummary } from "@/lib/extract";
+import { isTemplateId } from "@/lib/templates";
 
 const MAX_REFERRAL_LENGTH = 20_000;
 
@@ -12,7 +13,8 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: "Request body must be JSON." }, { status: 400 });
   }
 
-  const referralText = (body as { referralText?: unknown } | null)?.referralText;
+  const { referralText, templateId } = (body as { referralText?: unknown; templateId?: unknown } | null) ?? {};
+
   if (typeof referralText !== "string" || referralText.trim().length === 0) {
     return NextResponse.json({ error: "referralText is required." }, { status: 400 });
   }
@@ -22,10 +24,13 @@ export async function POST(request: Request): Promise<Response> {
       { status: 400 },
     );
   }
+  if (!isTemplateId(templateId)) {
+    return NextResponse.json({ error: "templateId must be one of the supported templates." }, { status: 400 });
+  }
 
   try {
-    const summary = await extractReferralSummary(referralText);
-    return NextResponse.json({ summary });
+    const summary = await extractSummary(templateId, referralText);
+    return NextResponse.json({ summary, templateId });
   } catch (error: unknown) {
     return NextResponse.json({ error: describeError(error) }, { status: statusForError(error) });
   }

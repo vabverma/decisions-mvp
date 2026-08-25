@@ -1,22 +1,52 @@
 "use client";
 
-import { SAMPLES } from "@/lib/samples";
+import { SAMPLES, type Sample } from "@/lib/samples";
+import { TEMPLATES, type TemplateId } from "@/lib/templates";
 
 interface ReferralFormProps {
   referralText: string;
+  templateId: TemplateId;
   isLoading: boolean;
   onTextChange: (text: string) => void;
+  onTemplateChange: (templateId: TemplateId) => void;
+  onLoadSample: (sample: Sample) => void;
   onExtract: () => void;
   onClear: () => void;
 }
 
-export function ReferralForm({ referralText, isLoading, onTextChange, onExtract, onClear }: ReferralFormProps) {
+export function ReferralForm({
+  referralText,
+  templateId,
+  isLoading,
+  onTextChange,
+  onTemplateChange,
+  onLoadSample,
+  onExtract,
+  onClear,
+}: ReferralFormProps) {
   return (
     <section className="panel">
       <div className="panel-head">
         <h2>Incoming referral</h2>
       </div>
       <div className="panel-body">
+        <div className="field-label" style={{ marginBottom: 6 }}>
+          Output format
+        </div>
+        <div className="samples">
+          {TEMPLATES.map((template) => (
+            <button
+              key={template.id}
+              type="button"
+              className={`chip-btn${templateId === template.id ? " active" : ""}`}
+              disabled={isLoading}
+              onClick={() => onTemplateChange(template.id)}
+            >
+              {template.label}
+            </button>
+          ))}
+        </div>
+
         <div className="samples">
           {SAMPLES.map((sample) => (
             <button
@@ -24,7 +54,7 @@ export function ReferralForm({ referralText, isLoading, onTextChange, onExtract,
               type="button"
               className="chip-btn"
               disabled={isLoading}
-              onClick={() => onTextChange(sample.text)}
+              onClick={() => onLoadSample(sample)}
             >
               {sample.label}
             </button>
@@ -49,8 +79,8 @@ export function ReferralForm({ referralText, isLoading, onTextChange, onExtract,
         </div>
 
         <div className="arch-note">
-          <strong>How this works:</strong> the referral text is sent to Claude, which extracts the nine-field
-          pre-chart schema below. Nothing is stored — each request is stateless.
+          <strong>How this works:</strong> the referral text is sent to Claude, which extracts it into the selected
+          output format. Nothing is stored — each request is stateless.
         </div>
       </div>
     </section>

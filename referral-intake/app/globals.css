@@ -229,6 +229,11 @@ button.chip-btn.ghost {
   border-color: var(--border-strong);
 }
 
+button.chip-btn.active {
+  background: var(--accent-strong);
+  color: var(--surface);
+}
+
 textarea#raw {
   width: 100%;
   min-height: 360px;

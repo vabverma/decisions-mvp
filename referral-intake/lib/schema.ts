@@ -3,7 +3,7 @@ import { z } from "zod";
 export const FieldStatus = z.enum(["extracted", "inferred", "missing"]);
 export type FieldStatus = z.infer<typeof FieldStatus>;
 
-const textField = z.object({
+export const textField = z.object({
   status: FieldStatus,
   value: z.string().describe("The field content. Empty string when status is missing."),
   sourceQuote: z
@@ -13,7 +13,7 @@ const textField = z.object({
     ),
 });
 
-const listField = z.object({
+export const listField = z.object({
   status: FieldStatus,
   items: z.array(z.string()),
 });
