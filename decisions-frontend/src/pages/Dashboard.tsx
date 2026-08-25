@@ -28,6 +28,7 @@ export default function Dashboard({ token }: DashboardProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [implementingId, setImplementingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchDashboard = async () => {
     try {
@@ -50,9 +51,24 @@ export default function Dashboard({ token }: DashboardProps) {
       await api.patch(`/decisions/${id}/implement`);
       await fetchDashboard();
     } catch (err) {
-      setError('Failed to mark recommendation as implemented');
+      setError('Failed to update recommendation status');
     } finally {
       setImplementingId(null);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this recommendation? This cannot be undone.')) {
+      return;
+    }
+    setDeletingId(id);
+    try {
+      await api.delete(`/decisions/${id}`);
+      await fetchDashboard();
+    } catch (err) {
+      setError('Failed to delete recommendation');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -121,6 +137,7 @@ export default function Dashboard({ token }: DashboardProps) {
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Annual Impact</th>
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Date</th>
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Status</th>
+                <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}></th>
               </tr>
             </thead>
             <tbody>
@@ -136,7 +153,14 @@ export default function Dashboard({ token }: DashboardProps) {
                   </td>
                   <td style={{ padding: '12px' }}>
                     {rec.status === 'implemented' ? (
-                      <span style={{ color: '#28a745', fontSize: '14px', fontWeight: 500 }}>✓ Implemented</span>
+                      <button
+                        onClick={() => handleImplement(rec.id)}
+                        disabled={implementingId === rec.id}
+                        title="Click to undo"
+                        style={{ fontSize: '13px', padding: '6px 12px', background: 'none', border: 'none', color: '#28a745', fontWeight: 500, cursor: 'pointer' }}
+                      >
+                        {implementingId === rec.id ? '...' : '✓ Implemented'}
+                      </button>
                     ) : (
                       <button
                         onClick={() => handleImplement(rec.id)}
@@ -146,6 +170,15 @@ export default function Dashboard({ token }: DashboardProps) {
                         {implementingId === rec.id ? '...' : 'Mark Implemented'}
                       </button>
                     )}
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    <button
+                      onClick={() => handleDelete(rec.id)}
+                      disabled={deletingId === rec.id}
+                      style={{ fontSize: '13px', padding: '6px 12px', background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer' }}
+                    >
+                      {deletingId === rec.id ? '...' : 'Delete'}
+                    </button>
                   </td>
                 </tr>
               ))}

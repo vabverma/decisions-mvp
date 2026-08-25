@@ -115,6 +115,7 @@ router.post('/pricing', verifyToken, costlyEndpointLimiter, async (req: Request,
   }
 });
 
+// Toggles between 'implemented' and 'pending' so a misclick can be undone.
 router.patch('/:id/implement', verifyToken, async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   const { id } = req.params;
@@ -122,7 +123,8 @@ router.patch('/:id/implement', verifyToken, async (req: Request, res: Response) 
   try {
     const result = await pool.query(
       `UPDATE recommendations
-       SET status = 'implemented', implemented_at = COALESCE(implemented_at, NOW())
+       SET status = CASE WHEN status = 'implemented' THEN 'pending' ELSE 'implemented' END,
+           implemented_at = CASE WHEN status = 'implemented' THEN NULL ELSE NOW() END
        WHERE id = $1 AND user_id = $2
        RETURNING id, status, implemented_at`,
       [id, userId]
@@ -135,7 +137,32 @@ router.patch('/:id/implement', verifyToken, async (req: Request, res: Response) 
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Implement recommendation error:', error);
-    res.status(500).json({ error: 'Failed to mark recommendation as implemented' });
+    res.status(500).json({ error: 'Failed to update recommendation status' });
+  }
+});
+
+router.delete('/:id', verifyToken, async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  const { id } = req.params;
+
+  try {
+    // Deleting the product cascades to delete its recommendation (FK ON
+    // DELETE CASCADE), so this one query cleans up both rows.
+    const result = await pool.query(
+      `DELETE FROM products
+       WHERE id = (SELECT product_id FROM recommendations WHERE id = $1 AND user_id = $2)
+       RETURNING id`,
+      [id, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Recommendation not found' });
+    }
+
+    res.json({ deleted: true });
+  } catch (error) {
+    console.error('Delete recommendation error:', error);
+    res.status(500).json({ error: 'Failed to delete recommendation' });
   }
 });
 
