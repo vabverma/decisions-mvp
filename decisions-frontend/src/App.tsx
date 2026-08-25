@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import PricingRecommendation from './pages/PricingRecommendation';
 import Integrations from './pages/Integrations';
@@ -23,6 +25,8 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login onLogin={setToken} />} />
         <Route path="/register" element={<Register onRegister={setToken} />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );

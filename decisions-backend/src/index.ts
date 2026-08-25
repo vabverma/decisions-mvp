@@ -3,7 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import { initializeDatabase } from './db/init';
+import { initializeDatabase, ensureAdditionalTables } from './db/init';
 import { initSentry } from './services/sentry.service';
 import authRoutes from './routes/auth';
 import decisionsRoutes from './routes/decisions';
@@ -77,5 +77,12 @@ app.listen(PORT, async () => {
       console.error('❌ Database initialization failed:', error);
       process.exit(1);
     }
+  }
+
+  try {
+    await ensureAdditionalTables();
+  } catch (error) {
+    console.error('❌ Failed to ensure additional tables:', error);
+    process.exit(1);
   }
 });

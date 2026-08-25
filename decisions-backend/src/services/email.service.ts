@@ -57,6 +57,23 @@ export async function sendWelcomeEmail(email: string, storeName: string): Promis
   });
 }
 
+export async function sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
+  const resetUrl = `${process.env.DASHBOARD_URL}/reset-password?token=${resetToken}`;
+  await sendEmail({
+    to: email,
+    subject: '🔑 Reset your DECISIONS password',
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Reset your password</h2>
+        <p>We received a request to reset your DECISIONS password. This link expires in 1 hour.</p>
+        <p><a href="${resetUrl}" style="background: #007bff; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Reset Password</a></p>
+        <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 32px 0;">
+        <p style="font-size: 12px; color: #999;">If you didn't request this, you can safely ignore this email — your password won't be changed.</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendFreeTierLimitEmail(email: string): Promise<void> {
   await sendEmail({
     to: email,
