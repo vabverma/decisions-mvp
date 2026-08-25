@@ -52,6 +52,10 @@ export default function App() {
         <Route path="/pricing" element={<PricingRecommendation token={token} />} />
         <Route path="/integrations" element={<Integrations token={token} />} />
         <Route path="/plans" element={<Pricing token={token} />} />
+        {/* Reachable even while logged in, e.g. a stale session token in
+            localStorage shouldn't block a reset-password link from an email */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </>
