@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import { initializeDatabase, ensureAdditionalTables } from './db/init';
 import { initSentry } from './services/sentry.service';
 import authRoutes from './routes/auth';
@@ -26,6 +27,8 @@ const PORT = process.env.PORT || 3000;
 // Render's internal LB address (and so express-rate-limit doesn't reject
 // the X-Forwarded-For header it sees).
 app.set('trust proxy', 1);
+
+app.use(helmet());
 
 const ALLOWED_ORIGINS = [
   process.env.DASHBOARD_URL,

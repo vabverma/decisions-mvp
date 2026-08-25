@@ -46,43 +46,9 @@ const pricingRecommendationSchema = z.object({
   annualImpact: z.number(),
 });
 
-function generateMockRecommendation(input: PricingInput): PricingRecommendation {
-  const baseMargin = ((input.currentPrice - input.cost) / input.currentPrice) * 100;
-  const recommendedPrice = input.competitorPrice > input.currentPrice
-    ? input.currentPrice * 1.15
-    : input.currentPrice * 1.08;
-
-  const margin = ((recommendedPrice - input.cost) / recommendedPrice) * 100;
-  const volumeChange = input.demandTrend === 'high' ? -5 : (input.demandTrend === 'low' ? 15 : 0);
-  const newVolume = input.monthlyVolume * (1 + volumeChange / 100);
-  const priceChange = ((recommendedPrice - input.currentPrice) / input.currentPrice) * 100;
-
-  const currentAnnualRevenue = input.currentPrice * input.monthlyVolume * 12;
-  const projectedMonthlyRevenue = recommendedPrice * newVolume;
-  const projectedAnnualRevenue = projectedMonthlyRevenue * 12;
-  const annualImpact = projectedAnnualRevenue - currentAnnualRevenue;
-
-  return {
-    recommendedPrice: Math.round(recommendedPrice * 100) / 100,
-    reasoning: `Based on market analysis, your product is positioned ${input.competitorPrice > input.currentPrice ? 'below' : 'near'} competitors. A ${priceChange > 0 ? 'modest increase' : 'slight decrease'} to $${(Math.round(recommendedPrice * 100) / 100).toFixed(2)} optimizes margin while accounting for ${input.demandTrend} demand. ${input.customerFeedback ? 'Customer feedback suggests ' + input.customerFeedback.toLowerCase() : ''}`,
-    projectedMargin: Math.round(margin * 10) / 10,
-    projectedMonthlyRevenue: Math.round(projectedMonthlyRevenue),
-    priceChange: Math.round(priceChange * 10) / 10,
-    projectedVolumeChange: Math.round(volumeChange * 10) / 10,
-    annualImpact: Math.round(annualImpact),
-  };
-}
-
 export async function getPricingRecommendation(
   input: PricingInput
 ): Promise<PricingRecommendation> {
-  const useRealAPI = process.env.USE_CLAUDE_API === 'true';
-
-  if (!useRealAPI) {
-    console.log('🧪 Using mock recommendation for:', input.productName);
-    return generateMockRecommendation(input);
-  }
-
   console.log('🤖 Getting pricing recommendation for:', input.productName);
   const prompt = `You are a pricing strategist for e-commerce businesses. Analyze the following product data and provide a specific price recommendation.
 
@@ -98,7 +64,6 @@ Provide your recommendation in this exact JSON format:
 {
   "recommendedPrice": <number>,
   "reasoning": "<2-3 sentence explanation of the strategy>",
-  "projectedMargin": <percentage>,
   "projectedMonthlyRevenue": <number>,
   "priceChange": <percentage>,
   "projectedVolumeChange": <percentage>,
@@ -111,29 +76,42 @@ Consider:
 3. Profit optimization (margin vs volume trade-off)
 4. Customer feedback sentiment`;
 
-  const message = await getClient().messages.create({
-    model: 'claude-sonnet-5',
-    max_tokens: 2048,
-    messages: [
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ],
-  });
+  let message;
+  try {
+    message = await getClient().messages.create({
+      model: 'claude-sonnet-5',
+      max_tokens: 2048,
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+    });
+  } catch (error: any) {
+    console.error('Anthropic API call failed:', { status: error?.status, name: error?.name, message: error?.message });
+    throw new Error('Pricing recommendation service is temporarily unavailable');
+  }
 
   // Content can include a leading "thinking" block before the "text" block,
   // so find the text block rather than assuming it's content[0].
   const textBlock = message.content.find((block) => block.type === 'text');
   const responseText = textBlock && textBlock.type === 'text' ? textBlock.text : '';
 
+  let parsed: Omit<PricingRecommendation, 'projectedMargin'>;
   try {
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('No JSON found in response');
 
-    return pricingRecommendationSchema.parse(JSON.parse(jsonMatch[0]));
+    parsed = pricingRecommendationSchema.omit({ projectedMargin: true }).parse(JSON.parse(jsonMatch[0]));
   } catch (error) {
     console.error('Failed to parse Claude response:', responseText, error);
     throw new Error('Failed to generate pricing recommendation');
   }
+
+  // Margin is deterministic arithmetic from numbers we already have -- compute
+  // it ourselves rather than trusting the model to do the division correctly.
+  const projectedMargin = Math.round(((parsed.recommendedPrice - input.cost) / parsed.recommendedPrice) * 1000) / 10;
+
+  return { ...parsed, projectedMargin };
 }
