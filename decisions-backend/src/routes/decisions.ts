@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { z } from 'zod';
 import { getPricingRecommendation } from '../services/claude.service';
+import { updateShopifyVariantPrice } from '../services/shopify.service';
 import { pool } from '../db/init';
 import { verifyToken } from '../middleware/auth';
 import { costlyEndpointLimiter } from '../middleware/rateLimit';
@@ -115,12 +116,87 @@ router.post('/pricing', verifyToken, costlyEndpointLimiter, async (req: Request,
   }
 });
 
+// Links a DECISIONS product to a real Shopify variant so future "Implement"
+// actions can push the recommended price to the live store.
+router.post('/:productId/link-shopify', verifyToken, async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  const { productId } = req.params;
+  const { variantId, productTitle } = req.body;
+
+  if (typeof variantId !== 'string' || typeof productTitle !== 'string') {
+    return res.status(400).json({ error: 'variantId and productTitle are required' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE products SET shopify_variant_id = $1, shopify_product_title = $2
+       WHERE id = $3 AND user_id = $4
+       RETURNING id, shopify_variant_id, shopify_product_title`,
+      [variantId, productTitle, productId, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Link Shopify product error:', error);
+    res.status(500).json({ error: 'Failed to link Shopify product' });
+  }
+});
+
 // Toggles between 'implemented' and 'pending' so a misclick can be undone.
+// When turning a recommendation on and its product is linked to a Shopify
+// variant, pushes the recommended price to the live store first -- if that
+// push fails, the local status is left unchanged so the UI never claims a
+// price change happened when it didn't.
 router.patch('/:id/implement', verifyToken, async (req: Request, res: Response) => {
   const userId = (req as any).user?.id;
   const { id } = req.params;
 
   try {
+    const current = await pool.query(
+      `SELECT r.status, r.recommended_price, p.shopify_variant_id
+       FROM recommendations r
+       JOIN products p ON p.id = r.product_id
+       WHERE r.id = $1 AND r.user_id = $2`,
+      [id, userId]
+    );
+
+    if (current.rows.length === 0) {
+      return res.status(404).json({ error: 'Recommendation not found' });
+    }
+
+    const { status, recommended_price, shopify_variant_id } = current.rows[0];
+    const turningOn = status !== 'implemented';
+    let pushedToShopify = false;
+
+    if (turningOn && shopify_variant_id) {
+      const integrationResult = await pool.query(
+        `SELECT access_token, store_id FROM integrations
+         WHERE user_id = $1 AND integration_type = 'shopify' AND status = 'connected'
+         ORDER BY created_at DESC LIMIT 1`,
+        [userId]
+      );
+      const integration = integrationResult.rows[0];
+
+      if (integration) {
+        try {
+          await updateShopifyVariantPrice(
+            integration.store_id,
+            integration.access_token,
+            shopify_variant_id,
+            Number(recommended_price)
+          );
+          pushedToShopify = true;
+        } catch (shopifyError) {
+          console.error('Failed to push price to Shopify:', shopifyError);
+          return res.status(502).json({ error: 'Failed to push the new price to Shopify. Recommendation was not marked implemented.' });
+        }
+      }
+    }
+
     const result = await pool.query(
       `UPDATE recommendations
        SET status = CASE WHEN status = 'implemented' THEN 'pending' ELSE 'implemented' END,
@@ -130,11 +206,7 @@ router.patch('/:id/implement', verifyToken, async (req: Request, res: Response) 
       [id, userId]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Recommendation not found' });
-    }
-
-    res.json(result.rows[0]);
+    res.json({ ...result.rows[0], pushedToShopify });
   } catch (error) {
     console.error('Implement recommendation error:', error);
     res.status(500).json({ error: 'Failed to update recommendation status' });

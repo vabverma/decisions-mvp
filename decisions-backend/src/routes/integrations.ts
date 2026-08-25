@@ -3,10 +3,37 @@ import { pool } from '../db/init';
 import { verifyToken } from '../middleware/auth';
 import { costlyEndpointLimiter } from '../middleware/rateLimit';
 import { isSafeExternalUrl } from '../utils/ssrfGuard';
+import { listShopifyVariants } from '../services/shopify.service';
 import axios from 'axios';
 
 const router = express.Router();
 router.use(costlyEndpointLimiter);
+
+// List the connected store's products/variants so the user can link one to
+// a DECISIONS recommendation.
+router.get('/shopify/products', verifyToken, async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+
+  try {
+    const integrationResult = await pool.query(
+      `SELECT access_token, store_id FROM integrations
+       WHERE user_id = $1 AND integration_type = 'shopify' AND status = 'connected'
+       ORDER BY created_at DESC LIMIT 1`,
+      [userId]
+    );
+    const integration = integrationResult.rows[0];
+
+    if (!integration) {
+      return res.status(400).json({ error: 'Shopify is not connected' });
+    }
+
+    const variants = await listShopifyVariants(integration.store_id, integration.access_token);
+    res.json({ variants });
+  } catch (error) {
+    console.error('Failed to list Shopify products:', error);
+    res.status(502).json({ error: 'Failed to fetch products from Shopify' });
+  }
+});
 
 // Connect to n8n webhook
 router.post('/n8n/connect', verifyToken, async (req: Request, res: Response) => {

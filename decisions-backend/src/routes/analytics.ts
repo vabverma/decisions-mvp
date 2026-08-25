@@ -23,7 +23,8 @@ router.get('/dashboard', verifyToken, async (req: Request, res: Response) => {
 
     // Get recent recommendations
     const recent = await pool.query(
-      `SELECT r.id, p.product_name, r.recommended_price, r.annual_impact, r.created_at, r.status
+      `SELECT r.id, p.id as product_id, p.product_name, r.recommended_price, r.annual_impact,
+              r.created_at, r.status, p.shopify_variant_id, p.shopify_product_title
        FROM recommendations r
        JOIN products p ON r.product_id = p.id
        WHERE r.user_id = $1
@@ -35,6 +36,11 @@ router.get('/dashboard', verifyToken, async (req: Request, res: Response) => {
     // Get subscription info
     const userResult = await pool.query(
       `SELECT subscription_tier FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    const shopifyResult = await pool.query(
+      `SELECT 1 FROM integrations WHERE user_id = $1 AND integration_type = 'shopify' AND status = 'connected' LIMIT 1`,
       [userId]
     );
 
@@ -57,6 +63,7 @@ router.get('/dashboard', verifyToken, async (req: Request, res: Response) => {
       stats,
       recentRecommendations,
       subscriptionTier: userResult.rows[0]?.subscription_tier,
+      shopifyConnected: shopifyResult.rows.length > 0,
     });
   } catch (error) {
     console.error('Dashboard analytics error:', error);

@@ -5,6 +5,18 @@ interface DashboardProps {
   token: string;
 }
 
+interface Recommendation {
+  id: string;
+  product_id: string;
+  product_name: string;
+  recommended_price: number;
+  annual_impact: number;
+  created_at: string;
+  status: string;
+  shopify_variant_id: string | null;
+  shopify_product_title: string | null;
+}
+
 interface DashboardData {
   stats: {
     total_recommendations: number;
@@ -12,23 +24,31 @@ interface DashboardData {
     avg_annual_impact: number;
     total_impact: number;
   };
-  recentRecommendations: Array<{
-    id: string;
-    product_name: string;
-    recommended_price: number;
-    annual_impact: number;
-    created_at: string;
-    status: string;
-  }>;
+  recentRecommendations: Recommendation[];
   subscriptionTier: string;
+  shopifyConnected: boolean;
+}
+
+interface ShopifyVariantOption {
+  variantId: string;
+  productTitle: string;
+  variantTitle: string;
+  price: string;
 }
 
 export default function Dashboard({ token }: DashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [implementingId, setImplementingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [linkingProductId, setLinkingProductId] = useState<string | null>(null);
+  const [shopifyVariants, setShopifyVariants] = useState<ShopifyVariantOption[] | null>(null);
+  const [variantsLoading, setVariantsLoading] = useState(false);
+  const [selectedVariantId, setSelectedVariantId] = useState('');
+  const [savingLink, setSavingLink] = useState(false);
 
   const fetchDashboard = async () => {
     try {
@@ -47,11 +67,15 @@ export default function Dashboard({ token }: DashboardProps) {
 
   const handleImplement = async (id: string) => {
     setImplementingId(id);
+    setNotice('');
     try {
-      await api.patch(`/decisions/${id}/implement`);
+      const response = await api.patch(`/decisions/${id}/implement`);
+      if (response.data.status === 'implemented' && response.data.pushedToShopify) {
+        setNotice('✅ Marked implemented and pushed the new price to Shopify.');
+      }
       await fetchDashboard();
-    } catch (err) {
-      setError('Failed to update recommendation status');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to update recommendation status');
     } finally {
       setImplementingId(null);
     }
@@ -69,6 +93,41 @@ export default function Dashboard({ token }: DashboardProps) {
       setError('Failed to delete recommendation');
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const startLinking = async (productId: string) => {
+    setLinkingProductId(productId);
+    setSelectedVariantId('');
+    setShopifyVariants(null);
+    setVariantsLoading(true);
+    try {
+      const response = await api.get('/integrations/shopify/products');
+      setShopifyVariants(response.data.variants);
+    } catch (err) {
+      setError('Failed to load Shopify products');
+      setLinkingProductId(null);
+    } finally {
+      setVariantsLoading(false);
+    }
+  };
+
+  const saveLink = async (productId: string) => {
+    const variant = shopifyVariants?.find((v) => v.variantId === selectedVariantId);
+    if (!variant) return;
+
+    setSavingLink(true);
+    try {
+      await api.post(`/decisions/${productId}/link-shopify`, {
+        variantId: variant.variantId,
+        productTitle: variant.productTitle,
+      });
+      setLinkingProductId(null);
+      await fetchDashboard();
+    } catch (err) {
+      setError('Failed to link Shopify product');
+    } finally {
+      setSavingLink(false);
     }
   };
 
@@ -109,6 +168,8 @@ export default function Dashboard({ token }: DashboardProps) {
           {data.subscriptionTier === 'free' && ' — 1 recommendation per month'}
         </p>
       </div>
+
+      {notice && <div className="success">{notice}</div>}
 
       <div className="grid">
         <div className="card">
@@ -154,6 +215,7 @@ export default function Dashboard({ token }: DashboardProps) {
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Annual Impact</th>
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Date</th>
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Status</th>
+                {data.shopifyConnected && <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Shopify</th>}
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}></th>
               </tr>
             </thead>
@@ -188,6 +250,56 @@ export default function Dashboard({ token }: DashboardProps) {
                       </button>
                     )}
                   </td>
+                  {data.shopifyConnected && (
+                    <td style={{ padding: '12px', fontSize: '13px' }}>
+                      {rec.shopify_variant_id ? (
+                        <span style={{ color: '#666' }} title={rec.shopify_product_title || ''}>
+                          🛍️ Linked
+                        </span>
+                      ) : linkingProductId === rec.product_id ? (
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          {variantsLoading ? (
+                            <span className="spinner" style={{ width: '14px', height: '14px' }}></span>
+                          ) : (
+                            <>
+                              <select
+                                value={selectedVariantId}
+                                onChange={(e) => setSelectedVariantId(e.target.value)}
+                                style={{ width: '160px', padding: '4px', fontSize: '12px', marginBottom: 0 }}
+                              >
+                                <option value="">Select product…</option>
+                                {shopifyVariants?.map((v) => (
+                                  <option key={v.variantId} value={v.variantId}>
+                                    {v.productTitle}{v.variantTitle !== 'Default Title' ? ` (${v.variantTitle})` : ''} — ${v.price}
+                                  </option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => saveLink(rec.product_id)}
+                                disabled={!selectedVariantId || savingLink}
+                                style={{ fontSize: '12px', padding: '4px 8px' }}
+                              >
+                                {savingLink ? '...' : 'Save'}
+                              </button>
+                              <button
+                                onClick={() => setLinkingProductId(null)}
+                                style={{ fontSize: '12px', padding: '4px 8px', background: 'none', border: 'none', color: '#999', cursor: 'pointer' }}
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => startLinking(rec.product_id)}
+                          style={{ fontSize: '12px', padding: '4px 8px', background: 'none', border: '1px solid #e5e5e5', color: '#666' }}
+                        >
+                          Link to Shopify
+                        </button>
+                      )}
+                    </td>
+                  )}
                   <td style={{ padding: '12px' }}>
                     <button
                       onClick={() => handleDelete(rec.id)}

@@ -49,6 +49,8 @@ export async function ensureAdditionalTables(): Promise<void> {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_token_hash ON password_reset_tokens(token_hash);
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS shopify_variant_id VARCHAR(255);
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS shopify_product_title VARCHAR(255);
   `);
 }
 

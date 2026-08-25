@@ -23,6 +23,8 @@ CREATE TABLE products (
   monthly_volume INTEGER,
   demand_trend VARCHAR(50), -- high, stable, low
   customer_feedback TEXT,
+  shopify_variant_id VARCHAR(255),
+  shopify_product_title VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
