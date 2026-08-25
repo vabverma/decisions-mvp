@@ -7,6 +7,7 @@ import { ReferralForm } from "@/components/ReferralForm";
 import { SummaryPanel } from "@/components/SummaryPanel";
 import type { NoteSummary } from "@/lib/schema";
 import type { Sample } from "@/lib/samples";
+import { withViewTransition } from "@/lib/viewTransition";
 import {
   fileToAttachment,
   isAllowedAttachmentType,
@@ -39,13 +40,17 @@ export default function Home() {
       if (!response.ok) {
         throw new Error(body.error ?? "Extraction failed.");
       }
-      setSummary(body.summary as NoteSummary);
-      setSummarySpecialty(body.specialty as string);
+      withViewTransition(() => {
+        setSummary(body.summary as NoteSummary);
+        setSummarySpecialty(body.specialty as string);
+        setIsLoading(false);
+      });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Extraction failed.");
-      setSummary(null);
-    } finally {
-      setIsLoading(false);
+      withViewTransition(() => {
+        setError(err instanceof Error ? err.message : "Extraction failed.");
+        setSummary(null);
+        setIsLoading(false);
+      });
     }
   }
 
