@@ -8,12 +8,21 @@ import type { ReferralSummary } from "@/lib/schema";
 import type { GynOncSummary } from "@/lib/templates/gynOnc";
 import type { TemplateId } from "@/lib/templates";
 import type { Sample } from "@/lib/samples";
+import {
+  fileToAttachment,
+  isAllowedAttachmentType,
+  MAX_ATTACHMENTS,
+  MAX_ATTACHMENT_BYTES,
+  type Attachment,
+} from "@/lib/attachments";
 
 type Summary = ReferralSummary | GynOncSummary;
 
 export default function Home() {
   const [referralText, setReferralText] = useState("");
   const [templateId, setTemplateId] = useState<TemplateId>("generic");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +34,7 @@ export default function Home() {
       const response = await fetch("/api/extract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ referralText, templateId }),
+        body: JSON.stringify({ referralText, templateId, attachments }),
       });
       const body = await response.json();
       if (!response.ok) {
@@ -40,9 +49,46 @@ export default function Home() {
     }
   }
 
+  async function handleAddFiles(files: FileList) {
+    setAttachmentError(null);
+    const incoming = Array.from(files);
+
+    if (attachments.length + incoming.length > MAX_ATTACHMENTS) {
+      setAttachmentError(`A maximum of ${MAX_ATTACHMENTS} attachments is supported.`);
+      return;
+    }
+
+    const oversized = incoming.find((f) => f.size > MAX_ATTACHMENT_BYTES);
+    if (oversized) {
+      setAttachmentError(`"${oversized.name}" exceeds the ${(MAX_ATTACHMENT_BYTES / (1024 * 1024)).toFixed(0)}MB limit.`);
+      return;
+    }
+
+    const unsupported = incoming.find((f) => !isAllowedAttachmentType(f.type));
+    if (unsupported) {
+      setAttachmentError(`"${unsupported.name}" is an unsupported file type. Use PDF, PNG, JPEG, WEBP, or GIF.`);
+      return;
+    }
+
+    try {
+      const newAttachments = await Promise.all(incoming.map(fileToAttachment));
+      setAttachments((prev) => [...prev, ...newAttachments]);
+      setSummary(null);
+      setError(null);
+    } catch (err: unknown) {
+      setAttachmentError(err instanceof Error ? err.message : "Could not read the selected file(s).");
+    }
+  }
+
+  function handleRemoveAttachment(filename: string) {
+    setAttachments((prev) => prev.filter((a) => a.filename !== filename));
+  }
+
   function handleLoadSample(sample: Sample) {
     setReferralText(sample.text);
     setTemplateId(sample.templateId);
+    setAttachments([]);
+    setAttachmentError(null);
     setSummary(null);
     setError(null);
   }
@@ -55,6 +101,8 @@ export default function Home() {
 
   function handleClear() {
     setReferralText("");
+    setAttachments([]);
+    setAttachmentError(null);
     setSummary(null);
     setError(null);
   }
@@ -69,8 +117,9 @@ export default function Home() {
           <h1>Referral Intake</h1>
         </div>
         <p className="top-note">
-          Turns a raw referral packet into the pre-chart summary a specialist actually needs, with every extracted
-          item traceable back to source and every uncertain item flagged for review before it reaches the chart.
+          Turns a raw referral packet — including attached scans, images, and lab reports — into the pre-chart
+          summary a specialist actually needs, with every extracted item traceable back to source and every
+          uncertain item flagged for review before it reaches the chart.
         </p>
       </header>
 
@@ -78,10 +127,14 @@ export default function Home() {
         <ReferralForm
           referralText={referralText}
           templateId={templateId}
+          attachments={attachments}
           isLoading={isLoading}
+          attachmentError={attachmentError}
           onTextChange={setReferralText}
           onTemplateChange={handleTemplateChange}
           onLoadSample={handleLoadSample}
+          onAddFiles={handleAddFiles}
+          onRemoveAttachment={handleRemoveAttachment}
           onExtract={handleExtract}
           onClear={handleClear}
         />
