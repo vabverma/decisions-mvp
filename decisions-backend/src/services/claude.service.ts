@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { z } from 'zod';
 
 let _client: Anthropic;
 
@@ -32,6 +33,18 @@ interface PricingRecommendation {
   projectedVolumeChange: number;
   annualImpact: number;
 }
+
+// Claude's output is free-form text we regex a JSON object out of; validate
+// its shape before it flows into typed Postgres columns.
+const pricingRecommendationSchema = z.object({
+  recommendedPrice: z.number(),
+  reasoning: z.string(),
+  projectedMargin: z.number(),
+  projectedMonthlyRevenue: z.number(),
+  priceChange: z.number(),
+  projectedVolumeChange: z.number(),
+  annualImpact: z.number(),
+});
 
 function generateMockRecommendation(input: PricingInput): PricingRecommendation {
   const baseMargin = ((input.currentPrice - input.cost) / input.currentPrice) * 100;
@@ -99,7 +112,7 @@ Consider:
 4. Customer feedback sentiment`;
 
   const message = await getClient().messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: 'claude-sonnet-5',
     max_tokens: 1024,
     messages: [
       {
@@ -115,10 +128,9 @@ Consider:
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('No JSON found in response');
 
-    const recommendation = JSON.parse(jsonMatch[0]) as PricingRecommendation;
-    return recommendation;
+    return pricingRecommendationSchema.parse(JSON.parse(jsonMatch[0]));
   } catch (error) {
-    console.error('Failed to parse Claude response:', responseText);
+    console.error('Failed to parse Claude response:', responseText, error);
     throw new Error('Failed to generate pricing recommendation');
   }
 }
