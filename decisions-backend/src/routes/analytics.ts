@@ -23,7 +23,7 @@ router.get('/dashboard', verifyToken, async (req: Request, res: Response) => {
 
     // Get recent recommendations
     const recent = await pool.query(
-      `SELECT r.id, p.product_name, r.recommended_price, r.annual_impact, r.created_at
+      `SELECT r.id, p.product_name, r.recommended_price, r.annual_impact, r.created_at, r.status
        FROM recommendations r
        JOIN products p ON r.product_id = p.id
        WHERE r.user_id = $1

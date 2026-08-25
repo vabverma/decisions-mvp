@@ -115,4 +115,28 @@ router.post('/pricing', verifyToken, costlyEndpointLimiter, async (req: Request,
   }
 });
 
+router.patch('/:id/implement', verifyToken, async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id;
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `UPDATE recommendations
+       SET status = 'implemented', implemented_at = COALESCE(implemented_at, NOW())
+       WHERE id = $1 AND user_id = $2
+       RETURNING id, status, implemented_at`,
+      [id, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Recommendation not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Implement recommendation error:', error);
+    res.status(500).json({ error: 'Failed to mark recommendation as implemented' });
+  }
+});
+
 export default router;

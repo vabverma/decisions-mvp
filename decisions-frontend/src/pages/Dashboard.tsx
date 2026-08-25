@@ -18,6 +18,7 @@ interface DashboardData {
     recommended_price: number;
     annual_impact: number;
     created_at: string;
+    status: string;
   }>;
   subscriptionTier: string;
 }
@@ -26,21 +27,34 @@ export default function Dashboard({ token }: DashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [implementingId, setImplementingId] = useState<string | null>(null);
+
+  const fetchDashboard = async () => {
+    try {
+      const response = await api.get('/analytics/dashboard');
+      setData(response.data);
+    } catch (err) {
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const response = await api.get('/analytics/dashboard');
-        setData(response.data);
-      } catch (err) {
-        setError('Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboard();
   }, [token]);
+
+  const handleImplement = async (id: string) => {
+    setImplementingId(id);
+    try {
+      await api.patch(`/decisions/${id}/implement`);
+      await fetchDashboard();
+    } catch (err) {
+      setError('Failed to mark recommendation as implemented');
+    } finally {
+      setImplementingId(null);
+    }
+  };
 
   if (loading) {
     return <div className="container"><div className="spinner"></div></div>;
@@ -106,6 +120,7 @@ export default function Dashboard({ token }: DashboardProps) {
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Recommended Price</th>
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Annual Impact</th>
                 <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Date</th>
+                <th style={{ textAlign: 'left', padding: '12px', fontWeight: 500 }}>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -118,6 +133,19 @@ export default function Dashboard({ token }: DashboardProps) {
                   </td>
                   <td style={{ padding: '12px', color: '#999', fontSize: '14px' }}>
                     {new Date(rec.created_at).toLocaleDateString()}
+                  </td>
+                  <td style={{ padding: '12px' }}>
+                    {rec.status === 'implemented' ? (
+                      <span style={{ color: '#28a745', fontSize: '14px', fontWeight: 500 }}>✓ Implemented</span>
+                    ) : (
+                      <button
+                        onClick={() => handleImplement(rec.id)}
+                        disabled={implementingId === rec.id}
+                        style={{ fontSize: '13px', padding: '6px 12px' }}
+                      >
+                        {implementingId === rec.id ? '...' : 'Mark Implemented'}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
