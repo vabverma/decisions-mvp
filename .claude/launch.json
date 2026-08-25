@@ -14,6 +14,13 @@
       "runtimeArgs": ["run", "dev"],
       "cwd": "${workspaceFolder}/decisions-frontend",
       "port": 3001
+    },
+    {
+      "name": "Referral Intake",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "-p", "3210"],
+      "cwd": "${workspaceFolder}/referral-intake",
+      "port": 3210
     }
   ]
 }
