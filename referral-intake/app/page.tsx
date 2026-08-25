@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Stethoscope } from "@phosphor-icons/react/dist/ssr";
 import { Disclaimer } from "@/components/Disclaimer";
 import { ReferralForm } from "@/components/ReferralForm";
 import { SummaryPanel } from "@/components/SummaryPanel";
@@ -113,8 +114,13 @@ export default function Home() {
 
       <header className="top">
         <div className="brand">
-          <span className="eyebrow">Specialist pre-chart extraction</span>
-          <h1>Referral Intake</h1>
+          <span className="brand-mark">
+            <Stethoscope weight="bold" size={22} />
+          </span>
+          <div className="brand-text">
+            <span className="eyebrow">Specialist pre-chart extraction</span>
+            <h1>Referral Intake</h1>
+          </div>
         </div>
         <p className="top-note">
           Turns a raw referral packet — including attached scans, images, and lab reports — into the pre-chart

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { CircleNotch, CloudArrowUp, FileImage, FilePdf, MagicWand, X } from "@phosphor-icons/react/dist/ssr";
 import { SAMPLES, type Sample } from "@/lib/samples";
 import { TEMPLATES, type TemplateId } from "@/lib/templates";
 import { MAX_ATTACHMENTS, MAX_ATTACHMENT_BYTES, type Attachment } from "@/lib/attachments";
@@ -23,6 +25,14 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function AttachmentIcon({ mediaType }: { mediaType: Attachment["mediaType"] }) {
+  return mediaType === "application/pdf" ? (
+    <FilePdf weight="bold" size={13} />
+  ) : (
+    <FileImage weight="bold" size={13} />
+  );
+}
+
 export function ReferralForm({
   referralText,
   templateId,
@@ -37,7 +47,9 @@ export function ReferralForm({
   onExtract,
   onClear,
 }: ReferralFormProps) {
+  const [isDragging, setIsDragging] = useState(false);
   const canExtract = (referralText.trim().length > 0 || attachments.length > 0) && !isLoading;
+  const canAddMore = attachments.length < MAX_ATTACHMENTS && !isLoading;
 
   return (
     <section className="panel">
@@ -88,39 +100,58 @@ export function ReferralForm({
         />
 
         <div className="field-label" style={{ marginTop: 14, marginBottom: 6 }}>
-          Attached documents (PDF, PNG, JPEG — up to {MAX_ATTACHMENTS})
+          Attached documents
         </div>
-        <input
-          type="file"
-          accept="application/pdf,image/png,image/jpeg,image/webp,image/gif"
-          multiple
-          disabled={isLoading || attachments.length >= MAX_ATTACHMENTS}
-          onChange={(event) => {
-            if (event.target.files) onAddFiles(event.target.files);
-            event.target.value = "";
+
+        <label
+          className={`dropzone${isDragging ? " dragging" : ""}`}
+          onDragOver={(event) => {
+            event.preventDefault();
+            if (canAddMore) setIsDragging(true);
           }}
-          style={{ fontSize: 13 }}
-        />
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={(event) => {
+            event.preventDefault();
+            setIsDragging(false);
+            if (canAddMore && event.dataTransfer.files.length > 0) onAddFiles(event.dataTransfer.files);
+          }}
+        >
+          <span className="icon">
+            <CloudArrowUp weight="light" size={26} />
+          </span>
+          <span className="dropzone-title">Drop files or click to browse</span>
+          <span className="dropzone-hint">
+            PDF, PNG, JPEG, WEBP, GIF — up to {MAX_ATTACHMENTS} files, {formatBytes(MAX_ATTACHMENT_BYTES)} each
+          </span>
+          <input
+            type="file"
+            className="dropzone-input"
+            accept="application/pdf,image/png,image/jpeg,image/webp,image/gif"
+            multiple
+            disabled={!canAddMore}
+            onChange={(event) => {
+              if (event.target.files) onAddFiles(event.target.files);
+              event.target.value = "";
+            }}
+          />
+        </label>
+
         {attachments.length > 0 && (
-          <div className="chip-list" style={{ marginTop: 8 }}>
+          <div className="chip-list" style={{ marginTop: 10 }}>
             {attachments.map((attachment) => (
-              <span className="data-chip" key={attachment.filename}>
+              <span className="data-chip removable" key={attachment.filename}>
+                <span className="icon">
+                  <AttachmentIcon mediaType={attachment.mediaType} />
+                </span>
                 {attachment.filename}
                 <button
                   type="button"
+                  className="chip-remove"
                   aria-label={`Remove ${attachment.filename}`}
                   onClick={() => onRemoveAttachment(attachment.filename)}
                   disabled={isLoading}
-                  style={{
-                    marginLeft: 6,
-                    border: "none",
-                    background: "none",
-                    color: "var(--ink-faint)",
-                    cursor: "pointer",
-                    font: "inherit",
-                  }}
                 >
-                  ×
+                  <X weight="bold" size={11} />
                 </button>
               </span>
             ))}
@@ -131,13 +162,12 @@ export function ReferralForm({
             {attachmentError}
           </div>
         )}
-        <div className="status-text" style={{ marginTop: 6 }}>
-          Max {formatBytes(MAX_ATTACHMENT_BYTES)} per file. Claude reads PDFs and images directly — scans and photos
-          work, not just clean text.
-        </div>
 
         <div className="extract-row">
           <button type="button" className="primary" disabled={!canExtract} onClick={onExtract}>
+            <span className="icon">
+              {isLoading ? <CircleNotch className="spin" weight="bold" size={16} /> : <MagicWand weight="bold" size={16} />}
+            </span>
             {isLoading ? "Extracting…" : "Extract pre-chart summary"}
           </button>
         </div>
