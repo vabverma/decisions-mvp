@@ -102,4 +102,61 @@ Pelvic mass, R19.00. Cyst of ovary, unspecified laterality, N83.209.
 Plan:
 Referring for gynecologic oncology evaluation and management.`,
   },
+  {
+    id: "derm",
+    label: "Load dermatology sample",
+    templateId: "generic",
+    text: `Westside Family Medicine
+482 Elm Street, Suite 200
+Springfield, IL
+
+August 20, 2026
+
+Dr. Priya Anand
+Springfield Dermatology Associates
+
+Re: Referral for Daniel Ruiz, DOB 11/02/1978
+
+Dear Dr. Anand,
+
+I am referring Mr. Ruiz for urgent dermatologic evaluation of a changing pigmented lesion on his right upper back, first noticed by his wife approximately 6 weeks ago. He reports the lesion has become darker and slightly raised, with irregular borders. No bleeding or itching reported. He has no personal history of skin cancer; his father had a melanoma removed at age 62.
+
+Relevant Findings:
+On exam, the lesion measures approximately 9mm, asymmetric, with irregular, notched borders and variegated brown-black pigmentation. No palpable regional lymphadenopathy noted on exam today.
+
+Past Medical History:
+Type 2 diabetes, well controlled. Seasonal allergies.
+
+Current Medications:
+Metformin 500mg twice daily.
+
+Allergies:
+NKDA.
+
+Given the ABCDE features noted on exam, I am requesting urgent dermoscopic evaluation and consideration of excisional biopsy to rule out melanoma. Please see within 1-2 weeks if possible.
+
+Thank you for your prompt attention to this referral.
+
+Sincerely,
+Dr. Melissa Farrow, Family Medicine`,
+  },
+  {
+    id: "neuro-messy",
+    label: "Load neurology sample (messy EHR paste)",
+    templateId: "generic",
+    text: `PT: Harold Whitfield MRN 88213741 DOB 4/2/1955
+REFERRAL TO: NEUROLOGY - c/o new onset tremor
+referring prov: J Okafor MD int med
+
+pt is a 71yo M who p/w progressive rt hand tremor x 8 mo, worse at rest, improves w/ voluntary movement per pt report. also c/o subtle gait changes per wife - shuffling, decreased arm swing on right. no falls. denies memory issues. handwriting has become smaller (wife noticed). no tremor w/ intention/action. pmhx htn, bph, gerd. meds: lisinopril 20mg qd, tamsulosin 0.4mg qhs, omeprazole 20mg qd. nkda.
+
+exam limited in office but tremor noted at rest in rt hand, appears to improve somewhat with distraction. mild rigidity rt upper extremity on passive rom. gait slightly stooped, decreased rt arm swing.
+
+labs from 6/2026 - tsh wnl, b12 wnl, cbc/cmp unremarkable
+
+pls eval for parkinsons vs essential tremor vs other etiology. would appreciate relatively soon given progression - within next month if possible. pt worried, would like plan of care.
+
+thx
+J Okafor`,
+  },
 ];

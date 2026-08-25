@@ -68,4 +68,5 @@ Rules:
 - resultsTimeline should include every dated lab or imaging result found anywhere in the packet, sorted chronologically.
 - redFlags are clinically significant terms or findings found anywhere in the text, each with surrounding context, so the reviewing clinician can confirm significance.
 - gaps are standard information a gynecologic oncology specialist would expect (e.g. tumor markers, imaging report, surgical history, menopausal status) that is absent from this referral.
+- You do not know today's date and must not assume one. Never compute or flag an age/date-of-birth discrepancy, a patient's current age from their DOB, or how much time has elapsed since a dated event, unless the referral itself states both figures needed for the comparison. Only flag a discrepancy that is internally inconsistent within the referral's own stated facts — never one that requires assuming what today's date is.
 - This output is a drafting aid only — a suggested summary the physician reviews and edits, never a final note.`;
