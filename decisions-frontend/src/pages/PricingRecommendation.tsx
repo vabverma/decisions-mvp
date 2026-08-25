@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../api';
+import InfoTooltip from '../components/InfoTooltip';
 
 interface PricingRecommendationProps {
   token: string;
@@ -72,7 +73,7 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
           <h3>Product Information</h3>
 
           <div className="form-group">
-            <label>Product Name *</label>
+            <label>Product Name *<InfoTooltip text="A short name to identify this product in your dashboard and reports." /></label>
             <input
               type="text"
               value={productName}
@@ -83,7 +84,7 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div className="form-group">
-              <label>Current Price ($) *</label>
+              <label>Current Price ($) *<InfoTooltip text="What you currently charge customers for this product." /></label>
               <input
                 type="number"
                 step="0.01"
@@ -94,7 +95,7 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
             </div>
 
             <div className="form-group">
-              <label>Cost ($) *</label>
+              <label>Cost ($) *<InfoTooltip text="Your cost to produce or acquire one unit. Used to calculate margin." /></label>
               <input
                 type="number"
                 step="0.01"
@@ -105,7 +106,7 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
             </div>
 
             <div className="form-group">
-              <label>Competitor Price ($)</label>
+              <label>Competitor Price ($)<InfoTooltip text="What a comparable competitor charges. Helps the AI gauge your market position." /></label>
               <input
                 type="number"
                 step="0.01"
@@ -115,7 +116,7 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
             </div>
 
             <div className="form-group">
-              <label>Monthly Volume (units) *</label>
+              <label>Monthly Volume (units) *<InfoTooltip text="How many units you currently sell per month at your current price." /></label>
               <input
                 type="number"
                 value={monthlyVolume}
@@ -126,7 +127,7 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
           </div>
 
           <div className="form-group">
-            <label>Demand Trend *</label>
+            <label>Demand Trend *<InfoTooltip text="Whether demand for this product has been rising, falling, or holding steady recently." /></label>
             <select value={demandTrend} onChange={(e) => setDemandTrend(e.target.value as any)}>
               <option value="high">High (increasing demand)</option>
               <option value="stable">Stable (consistent demand)</option>
@@ -135,7 +136,7 @@ export default function PricingRecommendation({ token }: PricingRecommendationPr
           </div>
 
           <div className="form-group">
-            <label>Customer Feedback (optional)</label>
+            <label>Customer Feedback (optional)<InfoTooltip text="Comments from customers about price, value, or competitors. The AI factors this into its recommendation." /></label>
             <textarea
               value={customerFeedback}
               onChange={(e) => setCustomerFeedback(e.target.value)}
