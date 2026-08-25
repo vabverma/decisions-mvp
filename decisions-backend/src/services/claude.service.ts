@@ -123,6 +123,7 @@ Consider:
   });
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+  console.log('Claude raw response:', JSON.stringify({ stopReason: message.stop_reason, contentTypes: message.content.map(c => c.type), usage: message.usage }));
 
   try {
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
