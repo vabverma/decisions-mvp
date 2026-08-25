@@ -113,7 +113,7 @@ Consider:
 
   const message = await getClient().messages.create({
     model: 'claude-sonnet-5',
-    max_tokens: 1024,
+    max_tokens: 2048,
     messages: [
       {
         role: 'user',
@@ -122,8 +122,10 @@ Consider:
     ],
   });
 
-  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-  console.log('Claude raw response:', JSON.stringify({ stopReason: message.stop_reason, contentTypes: message.content.map(c => c.type), usage: message.usage }));
+  // Content can include a leading "thinking" block before the "text" block,
+  // so find the text block rather than assuming it's content[0].
+  const textBlock = message.content.find((block) => block.type === 'text');
+  const responseText = textBlock && textBlock.type === 'text' ? textBlock.text : '';
 
   try {
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
