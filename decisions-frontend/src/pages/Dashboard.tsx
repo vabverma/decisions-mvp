@@ -82,9 +82,26 @@ export default function Dashboard({ token }: DashboardProps) {
 
   if (!data) return null;
 
+  const hasRecommendations = data.stats.total_recommendations > 0;
+
   return (
     <div className="container">
       <h1>Dashboard</h1>
+
+      <a href="/pricing" className="cta-banner" style={{ textDecoration: 'none' }}>
+        <div>
+          <div className="cta-banner-eyebrow">AI Pricing Engine</div>
+          <div className="cta-banner-title">
+            {hasRecommendations ? 'Ready for your next pricing win?' : 'Get your first pricing recommendation'}
+          </div>
+          <div className="cta-banner-subtitle">
+            {hasRecommendations
+              ? 'Analyze another product and see the projected impact in seconds.'
+              : 'Answer a few questions about a product and let AI find your optimal price.'}
+          </div>
+        </div>
+        <span className="cta-banner-button">✨ Get Recommendation</span>
+      </a>
 
       <div style={{ marginBottom: '32px', padding: '16px', background: '#e3f2fd', borderRadius: '8px' }}>
         <p style={{ fontSize: '14px', color: '#1976d2' }}>
@@ -127,7 +144,7 @@ export default function Dashboard({ token }: DashboardProps) {
 
       <div className="card">
         {data.recentRecommendations.length === 0 ? (
-          <p style={{ color: '#999' }}>No recommendations yet. <a href="/pricing">Get started →</a></p>
+          <p style={{ color: '#999' }}>No recommendations yet.</p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
