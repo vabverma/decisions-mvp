@@ -8,7 +8,7 @@ interface EmailOptions {
 }
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const FROM_EMAIL = 'noreply@decisions.so';
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'automatellc23@gmail.com';
 const FROM_NAME = 'DECISIONS';
 
 export async function sendEmail(options: EmailOptions): Promise<void> {
