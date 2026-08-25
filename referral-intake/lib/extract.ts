@@ -2,30 +2,31 @@ import "server-only";
 
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
-import { getTemplate, type TemplateId } from "@/lib/templates";
+import { NoteSummarySchema } from "@/lib/schema";
 import type { Attachment } from "@/lib/attachments";
 
 const MODEL = "claude-opus-5";
 
-function attachmentToContentBlock(attachment: Attachment): Anthropic.ContentBlockParam {
-  if (attachment.mediaType === "application/pdf") {
-    return {
-      type: "document",
-      source: { type: "base64", media_type: "application/pdf", data: attachment.base64 },
-    };
-  }
-  return {
-    type: "image",
-    source: { type: "base64", media_type: attachment.mediaType, data: attachment.base64 },
-  };
+function systemPromptFor(specialty: string): string {
+  return `You are a clinical intake assistant that drafts specialist pre-chart summaries for a ${specialty} practice. Given a raw referral packet (letter, imaging/lab reports, PCP notes — often combined, sometimes as attached PDFs or images), extract the fields in the schema into a consult-note-style structure so the specialist can review and continue directly into their own documentation.
+
+Rules:
+- Never invent or infer a clinical fact that is not supported by the text. If something is not present, leave it empty — do not guess.
+- The schema deliberately excludes vitals, physical exam, and assessment & plan — those require the in-person visit and must never be fabricated. Do not attempt to fill them.
+- openingNarrative is a draft dictation-style paragraph built only from facts explicitly present in the referral. If key facts (age, referring physician, reason) are missing, write a shorter paragraph rather than filling gaps — set status to "inferred" if you had to lightly restructure phrasing, "extracted" if it is a close restatement of the source, "missing" if there isn't enough to draft one.
+- icdCode on an active problem must be copied verbatim from the referral if present. Never assign or guess an ICD-10 code yourself, even for a plainly stated diagnosis.
+- resultsTimeline should include every dated lab or imaging result found anywhere in the packet, sorted chronologically.
+- You do not know today's date and must not assume one. Never compute or flag an age/date-of-birth discrepancy, a patient's current age from their DOB, or how much time has elapsed since a dated event, unless the referral itself states both figures needed for the comparison. Only flag a discrepancy that is internally inconsistent within the referral's own stated facts — never one that requires assuming what today's date is.
+- redFlags are clinically significant terms or findings found anywhere in the text, each with surrounding context, so the reviewing clinician can confirm significance.
+- gaps are standard information a ${specialty} specialist would expect that is absent from this referral.
+- This output is a drafting aid only — a suggested summary the physician reviews and edits, never a final note.`;
 }
 
 export async function extractSummary(
-  templateId: TemplateId,
+  specialty: string,
   referralText: string,
   attachments: Attachment[] = [],
 ): Promise<unknown> {
-  const template = getTemplate(templateId);
   const client = new Anthropic();
 
   const content: Anthropic.ContentBlockParam[] = attachments.map(attachmentToContentBlock);
@@ -43,10 +44,10 @@ export async function extractSummary(
   const response = await client.messages.parse({
     model: MODEL,
     max_tokens: 4096,
-    system: template.systemPrompt,
+    system: systemPromptFor(specialty),
     messages: [{ role: "user", content }],
     output_config: {
-      format: zodOutputFormat(template.schema),
+      format: zodOutputFormat(NoteSummarySchema),
     },
   });
 
@@ -55,4 +56,17 @@ export async function extractSummary(
   }
 
   return response.parsed_output;
+}
+
+function attachmentToContentBlock(attachment: Attachment): Anthropic.ContentBlockParam {
+  if (attachment.mediaType === "application/pdf") {
+    return {
+      type: "document",
+      source: { type: "base64", media_type: "application/pdf", data: attachment.base64 },
+    };
+  }
+  return {
+    type: "image",
+    source: { type: "base64", media_type: attachment.mediaType, data: attachment.base64 },
+  };
 }

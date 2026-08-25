@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { ClipboardText, Clock, Info, Stethoscope, Warning, WarningCircle } from "@phosphor-icons/react/dist/ssr";
-import type { GynOncSummary } from "@/lib/templates/gynOnc";
+import type { NoteSummary } from "@/lib/schema";
 import { FieldRow } from "./FieldRow";
 
 const EXAM_SECTIONS = [
@@ -51,11 +51,11 @@ function CompleteAtVisit({ label }: { label: string }) {
   );
 }
 
-interface GynOncSummaryPanelProps {
-  summary: GynOncSummary;
+interface NoteSummaryPanelProps {
+  summary: NoteSummary;
 }
 
-export function GynOncSummaryPanel({ summary }: GynOncSummaryPanelProps) {
+export function NoteSummaryPanel({ summary }: NoteSummaryPanelProps) {
   return (
     <>
       <div className="section-block review" style={{ marginTop: 0, marginBottom: 20 }}>
@@ -120,25 +120,7 @@ export function GynOncSummaryPanel({ summary }: GynOncSummaryPanelProps) {
         <BulletList items={summary.surgicalHistory} />
       </PlainRow>
 
-      <FieldRow label="OB/GYN history" status={summary.obGynHistory.status} index={6}>
-        {summary.obGynHistory.status === "missing" ? (
-          <div className="field-value empty">Not documented in this referral.</div>
-        ) : (
-          <>
-            <div className="chip-list">
-              <span className="data-chip">Gravida: {summary.obGynHistory.gravida || "—"}</span>
-              <span className="data-chip">Para: {summary.obGynHistory.para || "—"}</span>
-            </div>
-            {summary.obGynHistory.notes && (
-              <div className="field-value" style={{ marginTop: 6 }}>
-                {summary.obGynHistory.notes}
-              </div>
-            )}
-          </>
-        )}
-      </FieldRow>
-
-      <FieldRow label="Current medications" status={summary.currentMedications.status} index={7}>
+      <FieldRow label="Current medications" status={summary.currentMedications.status} index={6}>
         {summary.currentMedications.items.length === 0 ? (
           <div className="field-value empty">Not documented in this referral.</div>
         ) : (
@@ -152,7 +134,7 @@ export function GynOncSummaryPanel({ summary }: GynOncSummaryPanelProps) {
         )}
       </FieldRow>
 
-      <FieldRow label="Allergies" status={summary.allergies.status} index={8}>
+      <FieldRow label="Allergies" status={summary.allergies.status} index={7}>
         {summary.allergies.items.length === 0 ? (
           <div className="field-value empty">Not documented in this referral.</div>
         ) : (
@@ -166,12 +148,11 @@ export function GynOncSummaryPanel({ summary }: GynOncSummaryPanelProps) {
         )}
       </FieldRow>
 
-      <PlainRow label="Social history" index={9}>
+      <PlainRow label="Social history" index={8}>
         <BulletList items={summary.socialHistoryNotes} />
       </PlainRow>
 
       <CompleteAtVisit label="Vital signs" />
-      <CompleteAtVisit label="ECOG performance status" />
 
       <div className="section-block gaps" style={{ marginTop: 12 }}>
         <h3>

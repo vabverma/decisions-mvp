@@ -5,9 +5,7 @@ import { Stethoscope } from "@phosphor-icons/react/dist/ssr";
 import { Disclaimer } from "@/components/Disclaimer";
 import { ReferralForm } from "@/components/ReferralForm";
 import { SummaryPanel } from "@/components/SummaryPanel";
-import type { ReferralSummary } from "@/lib/schema";
-import type { GynOncSummary } from "@/lib/templates/gynOnc";
-import type { TemplateId } from "@/lib/templates";
+import type { NoteSummary } from "@/lib/schema";
 import type { Sample } from "@/lib/samples";
 import {
   fileToAttachment,
@@ -17,14 +15,14 @@ import {
   type Attachment,
 } from "@/lib/attachments";
 
-type Summary = ReferralSummary | GynOncSummary;
-
 export default function Home() {
   const [referralText, setReferralText] = useState("");
-  const [templateId, setTemplateId] = useState<TemplateId>("generic");
+  const [specialty, setSpecialty] = useState("");
+  const [isOtherSpecialty, setIsOtherSpecialty] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
-  const [summary, setSummary] = useState<Summary | null>(null);
+  const [summary, setSummary] = useState<NoteSummary | null>(null);
+  const [summarySpecialty, setSummarySpecialty] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,13 +33,14 @@ export default function Home() {
       const response = await fetch("/api/extract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ referralText, templateId, attachments }),
+        body: JSON.stringify({ referralText, specialty, attachments }),
       });
       const body = await response.json();
       if (!response.ok) {
         throw new Error(body.error ?? "Extraction failed.");
       }
-      setSummary(body.summary as Summary);
+      setSummary(body.summary as NoteSummary);
+      setSummarySpecialty(body.specialty as string);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Extraction failed.");
       setSummary(null);
@@ -87,21 +86,24 @@ export default function Home() {
 
   function handleLoadSample(sample: Sample) {
     setReferralText(sample.text);
-    setTemplateId(sample.templateId);
+    setSpecialty(sample.specialty);
+    setIsOtherSpecialty(false);
     setAttachments([]);
     setAttachmentError(null);
     setSummary(null);
     setError(null);
   }
 
-  function handleTemplateChange(next: TemplateId) {
-    setTemplateId(next);
+  function handleSpecialtyChange(next: string) {
+    setSpecialty(next);
     setSummary(null);
     setError(null);
   }
 
   function handleClear() {
     setReferralText("");
+    setSpecialty("");
+    setIsOtherSpecialty(false);
     setAttachments([]);
     setAttachmentError(null);
     setSummary(null);
@@ -132,19 +134,21 @@ export default function Home() {
       <div className="board">
         <ReferralForm
           referralText={referralText}
-          templateId={templateId}
+          specialty={specialty}
+          isOtherSpecialty={isOtherSpecialty}
           attachments={attachments}
           isLoading={isLoading}
           attachmentError={attachmentError}
           onTextChange={setReferralText}
-          onTemplateChange={handleTemplateChange}
+          onSpecialtyChange={handleSpecialtyChange}
+          onOtherSpecialtyToggle={setIsOtherSpecialty}
           onLoadSample={handleLoadSample}
           onAddFiles={handleAddFiles}
           onRemoveAttachment={handleRemoveAttachment}
           onExtract={handleExtract}
           onClear={handleClear}
         />
-        <SummaryPanel summary={summary} templateId={templateId} isLoading={isLoading} error={error} />
+        <SummaryPanel summary={summary} specialty={summarySpecialty} isLoading={isLoading} error={error} />
       </div>
 
       <div className="legend">

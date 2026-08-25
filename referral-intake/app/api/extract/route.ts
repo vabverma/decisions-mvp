@@ -1,10 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { extractSummary } from "@/lib/extract";
-import { isTemplateId } from "@/lib/templates";
 import { isAllowedAttachmentType, MAX_ATTACHMENTS, type Attachment } from "@/lib/attachments";
 
 const MAX_REFERRAL_LENGTH = 20_000;
+const MAX_SPECIALTY_LENGTH = 100;
 const MAX_ATTACHMENT_BASE64_LENGTH = 27_000_000; // ~20MB decoded
 
 interface RawAttachment {
@@ -23,9 +23,9 @@ export async function POST(request: Request): Promise<Response> {
 
   const {
     referralText,
-    templateId,
+    specialty,
     attachments: rawAttachments,
-  } = (body as { referralText?: unknown; templateId?: unknown; attachments?: unknown } | null) ?? {};
+  } = (body as { referralText?: unknown; specialty?: unknown; attachments?: unknown } | null) ?? {};
 
   if (typeof referralText !== "string") {
     return NextResponse.json({ error: "referralText must be a string." }, { status: 400 });
@@ -36,8 +36,14 @@ export async function POST(request: Request): Promise<Response> {
       { status: 400 },
     );
   }
-  if (!isTemplateId(templateId)) {
-    return NextResponse.json({ error: "templateId must be one of the supported templates." }, { status: 400 });
+  if (typeof specialty !== "string" || specialty.trim().length === 0) {
+    return NextResponse.json({ error: "specialty is required." }, { status: 400 });
+  }
+  if (specialty.length > MAX_SPECIALTY_LENGTH) {
+    return NextResponse.json(
+      { error: `specialty exceeds the ${MAX_SPECIALTY_LENGTH} character limit.` },
+      { status: 400 },
+    );
   }
 
   const attachmentsResult = parseAttachments(rawAttachments);
@@ -54,8 +60,8 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
-    const summary = await extractSummary(templateId, referralText, attachments);
-    return NextResponse.json({ summary, templateId });
+    const summary = await extractSummary(specialty.trim(), referralText, attachments);
+    return NextResponse.json({ summary, specialty: specialty.trim() });
   } catch (error: unknown) {
     return NextResponse.json({ error: describeError(error) }, { status: statusForError(error) });
   }

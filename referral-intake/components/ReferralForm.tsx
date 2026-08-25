@@ -3,17 +3,19 @@
 import { useState } from "react";
 import { CircleNotch, CloudArrowUp, FileImage, FilePdf, MagicWand, X } from "@phosphor-icons/react/dist/ssr";
 import { SAMPLES, type Sample } from "@/lib/samples";
-import { TEMPLATES, type TemplateId } from "@/lib/templates";
+import { OTHER_SPECIALTY, SPECIALTIES } from "@/lib/specialties";
 import { MAX_ATTACHMENTS, MAX_ATTACHMENT_BYTES, type Attachment } from "@/lib/attachments";
 
 interface ReferralFormProps {
   referralText: string;
-  templateId: TemplateId;
+  specialty: string;
+  isOtherSpecialty: boolean;
   attachments: Attachment[];
   isLoading: boolean;
   attachmentError: string | null;
   onTextChange: (text: string) => void;
-  onTemplateChange: (templateId: TemplateId) => void;
+  onSpecialtyChange: (specialty: string) => void;
+  onOtherSpecialtyToggle: (isOther: boolean) => void;
   onLoadSample: (sample: Sample) => void;
   onAddFiles: (files: FileList) => void;
   onRemoveAttachment: (filename: string) => void;
@@ -35,12 +37,14 @@ function AttachmentIcon({ mediaType }: { mediaType: Attachment["mediaType"] }) {
 
 export function ReferralForm({
   referralText,
-  templateId,
+  specialty,
+  isOtherSpecialty,
   attachments,
   isLoading,
   attachmentError,
   onTextChange,
-  onTemplateChange,
+  onSpecialtyChange,
+  onOtherSpecialtyToggle,
   onLoadSample,
   onAddFiles,
   onRemoveAttachment,
@@ -48,7 +52,8 @@ export function ReferralForm({
   onClear,
 }: ReferralFormProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const canExtract = (referralText.trim().length > 0 || attachments.length > 0) && !isLoading;
+
+  const canExtract = specialty.trim().length > 0 && (referralText.trim().length > 0 || attachments.length > 0) && !isLoading;
   const canAddMore = attachments.length < MAX_ATTACHMENTS && !isLoading;
 
   return (
@@ -57,24 +62,47 @@ export function ReferralForm({
         <h2>Incoming referral</h2>
       </div>
       <div className="panel-body">
-        <div className="field-label" style={{ marginBottom: 6 }}>
-          Output format
-        </div>
-        <div className="samples">
-          {TEMPLATES.map((template) => (
-            <button
-              key={template.id}
-              type="button"
-              className={`chip-btn${templateId === template.id ? " active" : ""}`}
-              disabled={isLoading}
-              onClick={() => onTemplateChange(template.id)}
-            >
-              {template.label}
-            </button>
-          ))}
-        </div>
+        <label className="field-label" htmlFor="specialty-select" style={{ display: "block", marginBottom: 6 }}>
+          Specialty
+        </label>
+        {isOtherSpecialty ? (
+          <input
+            type="text"
+            className="specialty-input"
+            placeholder="Type the specialty…"
+            autoFocus
+            value={specialty}
+            disabled={isLoading}
+            onChange={(event) => onSpecialtyChange(event.target.value)}
+          />
+        ) : (
+          <select
+            id="specialty-select"
+            className="specialty-select"
+            value={specialty}
+            disabled={isLoading}
+            onChange={(event) => {
+              if (event.target.value === OTHER_SPECIALTY) {
+                onOtherSpecialtyToggle(true);
+                onSpecialtyChange("");
+              } else {
+                onSpecialtyChange(event.target.value);
+              }
+            }}
+          >
+            <option value="" disabled>
+              Select a specialty…
+            </option>
+            {SPECIALTIES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+            <option value={OTHER_SPECIALTY}>Other…</option>
+          </select>
+        )}
 
-        <div className="samples">
+        <div className="samples" style={{ marginTop: 14 }}>
           {SAMPLES.map((sample) => (
             <button
               key={sample.id}
@@ -174,7 +202,8 @@ export function ReferralForm({
 
         <div className="arch-note">
           <strong>How this works:</strong> the referral text and any attached documents are sent to Claude, which
-          extracts them into the selected output format. Nothing is stored — each request is stateless.
+          extracts them into a consult-note-style summary for the selected specialty. Nothing is stored — each
+          request is stateless.
         </div>
       </div>
     </section>

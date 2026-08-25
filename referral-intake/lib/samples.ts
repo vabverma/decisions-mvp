@@ -1,9 +1,7 @@
-import type { TemplateId } from "@/lib/templates";
-
 export interface Sample {
   id: string;
   label: string;
-  templateId: TemplateId;
+  specialty: string;
   text: string;
 }
 
@@ -11,7 +9,7 @@ export const SAMPLES: Sample[] = [
   {
     id: "cardio",
     label: "Load cardiology sample",
-    templateId: "generic",
+    specialty: "Cardiology",
     text: `Dear Dr. Reyes,
 
 I am referring my patient, Margaret Coyle (DOB 03/14/1962), for cardiology evaluation.
@@ -44,7 +42,7 @@ Dr. A. Patel, Internal Medicine`,
   {
     id: "ortho",
     label: "Load orthopedics sample",
-    templateId: "generic",
+    specialty: "Orthopedic Surgery",
     text: `Referring Physician: Dr. K. Nomura, Family Medicine
 Date: 08/18/2026
 
@@ -72,7 +70,7 @@ Referring for orthopedic evaluation and consideration of MRI if not already obta
   {
     id: "gynonc",
     label: "Load gynecologic oncology sample",
-    templateId: "gyn-onc",
+    specialty: "Gynecologic Oncology",
     text: `Referring Physician: Dr. Bradley Goldberg
 Date: 07/30/2026
 
@@ -105,7 +103,7 @@ Referring for gynecologic oncology evaluation and management.`,
   {
     id: "derm",
     label: "Load dermatology sample",
-    templateId: "generic",
+    specialty: "Dermatology",
     text: `Westside Family Medicine
 482 Elm Street, Suite 200
 Springfield, IL
@@ -143,7 +141,7 @@ Dr. Melissa Farrow, Family Medicine`,
   {
     id: "neuro-messy",
     label: "Load neurology sample (messy EHR paste)",
-    templateId: "generic",
+    specialty: "Neurology",
     text: `PT: Harold Whitfield MRN 88213741 DOB 4/2/1955
 REFERRAL TO: NEUROLOGY - c/o new onset tremor
 referring prov: J Okafor MD int med
